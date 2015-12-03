@@ -3,7 +3,7 @@
 I hate snake, but I like Scala and want to use this for my Robotic boat. 
 Bah bah bah ... if you are a scala programmer, the example code below will make more sense than bah bah bah
 
-require pi4j
+currently it requires pi4j (https://github.com/Pi4J/pi4j) for i2c, but I will eventually remove, becasue of incompatible license.
 
 TODO:  include sbt buit script.
 
