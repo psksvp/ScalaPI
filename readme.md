@@ -1,6 +1,8 @@
-# ScalaPI: Interfacing with Rasberry PI hardware with Scala#
+# ScalaPI: Interfacing Rasberry PI hardware with Scala#
 
-I hate snake, but I like Scala and want to use this for my Robotic boat. 
+TODO: write below better than this.
+
+I hate snake which is commonly used on the PI, but I like Scala and want to use this for my Robotic boat. 
 Bah bah bah ... if you are a scala programmer, the example code below will make more sense than bah bah bah
 
 currently it requires pi4j (https://github.com/Pi4J/pi4j) for i2c, but I will eventually remove, becasue of incompatible license.
