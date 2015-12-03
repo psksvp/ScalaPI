@@ -40,7 +40,7 @@ package psksvp.RPi
   */
 object SenseHat
 {
-
+  //////////////////// 8x8 LED ///////////////////////
   /**
     *
     * @param fbDevicePath
@@ -49,7 +49,7 @@ object SenseHat
   {
     private val text = " +-*/!\"#$><0123456789.=)(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz?,;:|@%[&_']\\~"
     private var rotation = 0
-    // this lookup tables are from SenseHat snake library. 
+    // this lookup tables are from SenseHat snake library.
     private val pixMap000 = Array(Array( 0,  1,  2,  3,  4,  5,  6,  7),
                                   Array( 8,  9, 10, 11, 12, 13, 14, 15),
                                   Array(16, 17, 18, 19, 20, 21, 22, 23),
@@ -191,9 +191,7 @@ object SenseHat
     }
   }
 
-  /**
-    * 
-    */
+  //////////////////// IMU ///////////////////////
   class SensorDevice
   {
     import psksvp.jni.rpi.{PiSensors, SensorData}
@@ -263,5 +261,71 @@ object SenseHat
       sensorDevice
     else
       sys.error("SenseHat.sensors hardware init fail")
+  }
+
+  //////////////////// stick ///////////////////////
+  final val UP = 103
+  final val LEFT = 105
+  final val RIGHT = 106
+  final val DOWN = 108
+  final val ENTER = 28
+  class Stick(devicePath:String)
+  {
+    private final val evKey = 0x01
+    private val inputBuffer = Array.ofDim[Byte](16)
+
+    /**
+      * blocking read
+      * @return key code, up -> 103, left -> 105, right -> 106, down -> 108, enter (push) -> 28
+      */
+    def read:Int=
+    {
+      import java.io.FileInputStream
+      import psksvp.Math.FromBytes
+      val devFile = new FileInputStream(devicePath)
+      devFile.read(inputBuffer)
+      devFile.close
+
+      val inputType = FromBytes.makeShort(lo=inputBuffer(9), hi=inputBuffer(8))
+      val keyCode = FromBytes.makeShort(lo=inputBuffer(11), hi=inputBuffer(10))
+      if(evKey == inputType)
+        keyCode
+      else
+        -1
+    }
+  }
+
+  private var stickDev:Option[Stick] = None
+  def stick:Stick=
+  {
+    def findJoyStickDevicePath:Option[String]=
+    {
+      import psksvp.FileSystem.{ListFiles, SimpleFileIO}
+      import java.io.File
+      for(dir <- ListFiles(dir="/sys/class/input/", deep=false))
+      {
+        if (true == dir.isDirectory && dir.getName.indexOf("event") == 0)
+        {
+          val nameFile = dir.getAbsolutePath + "/device/name"
+          val content = SimpleFileIO.readStringFromFile(nameFile)
+          if(content.trim == "Raspberry Pi Sense HAT Joystick")
+            return Some("/dev/input/" + dir.getName)
+        }
+      }
+      None
+    }
+
+    stickDev match
+    {
+      case Some(stickInstance) => stickInstance
+      case None =>
+        findJoyStickDevicePath match
+        {
+          case Some(path) => stickDev = Some(new Stick(path))
+                             stickDev.get
+          case None       => sys.error("There is no sense stick to be found")
+        }
+    }
+
   }
 }

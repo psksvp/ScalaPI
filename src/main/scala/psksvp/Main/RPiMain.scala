@@ -37,6 +37,7 @@ object RPiMain
 {
   def main(args:Array[String]):Unit=
   {
+    testSenseHatStick
     testSenseHatDisplayRotate
     testSenseHatDisplayRandomColors
     testSenseHatSensors
@@ -148,6 +149,39 @@ object RPiMain
     sensors.deinit
   }
 
+  def testSenseHatStick:Unit=
+  {
+    import psksvp.RPi.SenseHat
+    val display = SenseHat.display
+    val index = (0 to 7)
+    display.clear
+
+    for(i <- index)
+    {
+      display.setPixel(3, i, (255, 0, 0))
+      display.setPixel(4, i, (0, 0, 255))
+      display.setPixel(i, 0, (0, 255, 0))
+    }
+
+    println("test sense stick\nmove the stick to test\npush down to exit")
+    val stick = SenseHat.stick
+    var code = stick.read
+    while(28 != code)
+    {
+      println(code)
+      code match
+      {
+        case SenseHat.UP    => display.setRotation(0)
+        case SenseHat.LEFT  => display.setRotation(270)
+        case SenseHat.RIGHT => display.setRotation(90)
+        case SenseHat.DOWN  => display.setRotation(180)
+        case _              =>
+      }
+
+      code = stick.read
+    }
+  }
+
   def testPWMHatServo:Unit=
   {
     println("TestServo PWM")
@@ -158,13 +192,28 @@ object RPiMain
     pwmHat.attachDevice(servo1, channel=0)
     pwmHat.attachDevice(servo0, channel=3)
     var pos = 0
-    while(pos <= 180)
+    while(pos <= 90)
     {
       println("Angle -> " + pos)
       servo1.set(pos)
       servo0.set(pos)
       Thread.sleep(1000)
       pos = pos + 1
+    }
+
+    import scala.util.Random
+    val rdGen = new Random
+    var cnt = 10
+    while(cnt >= 0)
+    {
+      val a1 = rdGen.nextInt(180)
+      val a2 = rdGen.nextInt(180)
+      println("Angles -> " + a1 + " " + a2)
+      servo0.set(a1)
+      Thread.sleep(1000)
+      servo1.set(a2)
+      Thread.sleep(1000)
+      cnt = cnt - 1
     }
   }
 }

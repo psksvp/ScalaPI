@@ -69,3 +69,4 @@ abstract class PWMDevice(rawRange:Range, logicalRange:Range)
   */
 case class Servo(armAngleRange:Range) extends PWMDevice(150 to 600, armAngleRange)
 
+case class ESC() extends PWMDevice(150 to 600, -128 to 128)
