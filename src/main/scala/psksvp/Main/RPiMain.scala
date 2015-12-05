@@ -166,15 +166,15 @@ object RPiMain
     println("test sense stick\nmove the stick to test\npush down to exit")
     val stick = SenseHat.stick
     var code = stick.read
-    while(28 != code)
+    while(SenseHat.kENTER != code)
     {
       println(code)
       code match
       {
-        case SenseHat.UP    => display.setRotation(0)
-        case SenseHat.LEFT  => display.setRotation(270)
-        case SenseHat.RIGHT => display.setRotation(90)
-        case SenseHat.DOWN  => display.setRotation(180)
+        case SenseHat.kUP    => display.setRotation(0)
+        case SenseHat.kLEFT  => display.setRotation(270)
+        case SenseHat.kRIGHT => display.setRotation(90)
+        case SenseHat.kDOWN  => display.setRotation(180)
         case _              =>
       }
 

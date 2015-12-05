@@ -31,12 +31,14 @@ The BSD 3-Clause License
 
 package psksvp.RPi
 
-
 /**
   * Created by psksvp on 29/11/2015.
   *
-  * this classs controls sense hat
+  * this class interfaces with Sense Hat
   * https://www.raspberrypi.org/products/sense-hat/
+  *
+  * There can be only one SenseHat attached with Raspberry Pi
+  * thus, SenseHat is Object
   */
 object SenseHat
 {
@@ -99,7 +101,7 @@ object SenseHat
 
     def clear:Unit=
     {
-      for(i <- 0 to pixBuf.length - 1)
+      for(i <- pixBuf.indices)
         pixBuf(i) = 0
       update
     }
@@ -125,7 +127,7 @@ object SenseHat
         val r = (red >> 3) & 0x1F
         val g = (green >> 2) & 0x3F
         val b = (blue >> 3) & 0x1F
-        val pix16 = ((r << 11) + (g << 5) + b)
+        val pix16 = (r << 11) + (g << 5) + b
         Array[Byte]((pix16 & 0xff).toByte, ((pix16 >> 8) & 0xff).toByte)
       }
 
@@ -144,7 +146,7 @@ object SenseHat
       {
         val r = (pix16 & 0xF800) >> 11
         val g = (pix16 & 0x7E0) >> 5
-        val b = (pix16 & 0x1F)
+        val b = pix16 & 0x1F
         (r << 3, g << 2, b << 3)
       }
 
@@ -167,7 +169,7 @@ object SenseHat
       import java.io.File
       for(dir <- ListFiles(dir="/sys/class/graphics/", deep=false))
       {
-        if (true == dir.isDirectory && dir.getName.indexOf("fb") == 0)
+        if (dir.isDirectory &&  0 == dir.getName.indexOf("fb"))
         {
           val nameFile = dir.getAbsolutePath + File.separator + "name"
           val content = SimpleFileIO.readStringFromFile(nameFile)
@@ -264,17 +266,18 @@ object SenseHat
   }
 
   //////////////////// stick ///////////////////////
-  final val UP = 103
-  final val LEFT = 105
-  final val RIGHT = 106
-  final val DOWN = 108
-  final val ENTER = 28
+  final val kUP = 103
+  final val kLEFT = 105
+  final val kRIGHT = 106
+  final val kDOWN = 108
+  final val kENTER = 28
   class Stick(devicePath:String)
   {
     private final val evKey = 0x01
     private val inputBuffer = Array.ofDim[Byte](16)
 
     /**
+      * TODO, implement non-blocking read
       * blocking read
       * @return key code, up -> 103, left -> 105, right -> 106, down -> 108, enter (push) -> 28
       */
@@ -282,6 +285,11 @@ object SenseHat
     {
       import java.io.FileInputStream
       import psksvp.Math.FromBytes
+      /*
+        each input is 16 bytes.
+        long,long,short,    short,  int
+        time,time,inputType,keyCode,value
+       */
       val devFile = new FileInputStream(devicePath)
       devFile.read(inputBuffer)
       devFile.close
@@ -304,7 +312,7 @@ object SenseHat
       import java.io.File
       for(dir <- ListFiles(dir="/sys/class/input/", deep=false))
       {
-        if (true == dir.isDirectory && dir.getName.indexOf("event") == 0)
+        if (dir.isDirectory && 0 == dir.getName.indexOf("event"))
         {
           val nameFile = dir.getAbsolutePath + "/device/name"
           val content = SimpleFileIO.readStringFromFile(nameFile)
