@@ -87,5 +87,5 @@ class PWMController(frequency:Double, i2cAddress:Int,  i2cBus:Int=I2CBus.BUS_1)
     device.write(kAllOffHigh, (off >> 8).toByte)
   }
 
-  def softwareReset()=generalCallI2C.write(0x06.toByte)
+  def softwareReset=generalCallI2C.write(0x06.toByte)
 }

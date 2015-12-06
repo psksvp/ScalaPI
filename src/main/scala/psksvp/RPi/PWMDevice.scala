@@ -56,7 +56,7 @@ abstract class PWMDevice
   * @param logicalRange
   */
                                              // unsure why 150 to 600, just copy from adafruit code
-abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(150 to 600)) extends PWMDevice
+abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) extends PWMDevice
 {
   import psksvp.Math.ScaleValue
   private val scale = new ScaleValue(logicalRange.min, logicalRange.max, rawRange.min, rawRange.max)
@@ -76,13 +76,22 @@ abstract class MotorPWMDevice extends PWMDevice
 case class Servo(armAngleRange:Range) extends RangePWMDevice(armAngleRange)
 case class ESC() extends RangePWMDevice(-128 to 128)
 
+
+
+abstract class MotorCommand
+case class Forward() extends MotorCommand
+case class Backward() extends MotorCommand
+case class Break() extends MotorCommand
+case class Release() extends MotorCommand
+
+abstract class SteppingCommand
+case class SingleStep() extends SteppingCommand
+case class DoubleStep() extends SteppingCommand
+case class InterleaveStep() extends SteppingCommand
+case class MicroStep() extends SteppingCommand
+
 case class DCMotor() extends MotorPWMDevice
 {
-  final val kFORWARD = 1
-  final val kBACKWARD = 2
-  final val kBRAKE = 3
-  final val kRELEASE = 4
-
   private val speedLimit = psksvp.Math.Limit[Int](0, 255)
   private var pwmPin = 0
   private var in1Pin = 0
@@ -90,6 +99,7 @@ case class DCMotor() extends MotorPWMDevice
 
   override def init(h:Option[PWMController], ch:Int):Unit=
   {
+    require(ch >= 0 && ch < 4)
     super.init(h, ch)
     ch match
     {
@@ -109,23 +119,23 @@ case class DCMotor() extends MotorPWMDevice
     }
   }
 
-  def forward()=run(kFORWARD)
-  def backward()=run(kBACKWARD)
-  def release()=run(kRELEASE)
+  def forward()=run(Forward())
+  def backward()=run(Backward())
+  def release()=run(Release())
 
-  def run(command:Int):Unit=
+  def run(command:MotorCommand):Unit=
   {
     pwmController match
     {
       case Some(pwm) =>
         command match
         {
-          case `kFORWARD`  => pwm.setPin(in2Pin, 0)
-                              pwm.setPin(in1Pin, 1)
-          case `kBACKWARD` => pwm.setPin(in1Pin, 0)
-                              pwm.setPin(in2Pin, 1)
-          case `kRELEASE`  => pwm.setPin(in1Pin, 0)
-                              pwm.setPin(in2Pin, 0)
+          case Forward()  => pwm.setPin(in2Pin, 0)
+                             pwm.setPin(in1Pin, 1)
+          case Backward() => pwm.setPin(in1Pin, 0)
+                             pwm.setPin(in2Pin, 1)
+          case Release()  => pwm.setPin(in1Pin, 0)
+                             pwm.setPin(in2Pin, 0)
         }
       case None      => println(this + " this DCMotor has not been attached to any PWMController")
     }
@@ -138,6 +148,87 @@ case class DCMotor() extends MotorPWMDevice
       case Some(pwm) => pwm.send(pwmPin, 0, speedLimit(s) * 16)
       case None      => println(this + " this DCMotor has not been attached to any PWMController")
     }
+  }
+}
+
+case class StepperMotor(steps:Int=200,
+                        microSteps:Int=8,
+                        microStepCurve:Array[Int]=Array(0, 50, 98, 142, 180, 212, 236, 250, 255)) extends MotorPWMDevice
+{
+  private val revSteps = steps
+  private var secPerStep = 0.1
+  private var steppingCounter = 0
+  private var currentStep = 0
+
+  private var PWMA = 8
+  private var AIN2 = 9
+  private var AIN1 = 10
+  private var PWMB = 13
+  private var BIN2 = 12
+  private var BIN1 = 11
+
+  override def init(h:Option[PWMController], ch:Int):Unit=
+  {
+    require(0 == ch || 1 == ch)
+    super.init(h, ch)
+    if(1 == ch)
+    {
+      PWMA = 2
+      AIN2 = 3
+      AIN1 = 4
+      PWMB = 7
+      BIN2 = 6
+      BIN1 = 5
+    }
+  }
+
+  def setSpeed(rpm:Int):Unit=
+  {
+    secPerStep = 60.0 / (revSteps * rpm)
+    steppingCounter = 0
+  }
+
+  def oneStep(dir:MotorCommand, style:SteppingCommand):Unit=
+  {
+    def singleStep(dir:MotorCommand):Unit=
+    {
+      if((currentStep / (microSteps / 2)) % 2 != 0)
+      {
+
+      }
+      else
+      {
+
+      }
+    }
+
+    def doubleStep(dir:MotorCommand):Unit=
+    {
+
+    }
+
+    def interleaveStep(dir:MotorCommand):Unit=
+    {
+
+    }
+
+    def microStep(dir:MotorCommand):Unit=
+    {
+
+    }
+
+
+    val pwmA = 255
+    val pwmB = 255
+    style match
+    {
+      case SingleStep() => singleStep(dir)
+      case DoubleStep() => doubleStep(dir)
+      case InterleaveStep() => interleaveStep(dir)
+      case MicroStep() => microStep(dir)
+    }
+
+
   }
 }
 

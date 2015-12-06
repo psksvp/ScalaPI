@@ -40,7 +40,7 @@ package psksvp.RPi
   * There can be only one SenseHat attached with Raspberry Pi
   * thus, SenseHat is Object
   */
-object SenseHat
+object SenseHAT
 {
   //////////////////// 8x8 LED ///////////////////////
   /**
@@ -49,7 +49,6 @@ object SenseHat
     */
   class LEDDisplay(fbDevicePath:String)
   {
-    private val text = " +-*/!\"#$><0123456789.=)(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz?,;:|@%[&_']\\~"
     private var rotation = 0
     // this lookup tables are from SenseHat snake library.
     private val pixMap000 = Array(Array( 0,  1,  2,  3,  4,  5,  6,  7),
@@ -158,6 +157,48 @@ object SenseHat
       val high = pixBuf(offset + 1)
       unpackRGB( (((high & 0xFF) << 8) | (low & 0xFF)).toShort )
     }
+
+    def drawBitmap(bits:Long, color:(Int, Int, Int)):Unit=
+    {
+      import java.lang.Long
+      val bin = ("0" * Long.numberOfLeadingZeros(bits)) + bits.toBinaryString
+      // a bit lazy
+      val index = 0 to 7
+      var i = 0
+      for (y <- index; x <- index)
+      {
+        if('1' == bin(i))
+          setPixel(x, y, color)
+
+        i = i + 1
+      }
+    }
+
+    def drawBitmap(bits:String, color:(Int, Int, Int)):Unit=
+    {
+      require(64 == bits.length)
+
+      val index = 0 to 7
+      var i = 0
+      for (y <- index; x <- index)
+      {
+        if('1' == bits(i))
+          setPixel(x, y, color)
+        i = i + 1
+      }
+    }
+
+    def drawChar(c:Char, color:(Int, Int, Int), sleep:Int=0):Unit=
+    {
+      import psksvp.Symbols.AsciiBitmap
+      clear
+      drawBitmap(AsciiBitmap(c.toInt), color)
+      update
+      if(sleep > 0)
+        Thread.sleep(sleep)
+    }
+
+    def drawString(s:String, color:(Int, Int, Int)):Unit=s.foreach(drawChar(_, color, 1000))
   }
 
   private var ledDisplay:Option[LEDDisplay] = None

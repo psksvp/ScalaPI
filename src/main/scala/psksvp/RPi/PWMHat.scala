@@ -41,7 +41,7 @@ import com.pi4j.io.i2c.I2CBus
   *
   * many PWM hats can be stacked as long as they use different i2c address.
   */
-class PWMHat(frequency:Double=60.0,
+class PWMHAT(frequency:Double=60.0,
              i2cAddress:Int=0x40,
              i2cBus:Int=I2CBus.BUS_1) extends AdaFruitPWMI2CBoard[RangePWMDevice](16, i2cAddress,i2cBus)
 {

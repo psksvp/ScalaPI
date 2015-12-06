@@ -5,7 +5,7 @@ package psksvp.RPi
   */
 
 import com.pi4j.io.i2c.I2CBus
-class MotorHat(frequency:Double=1600.0,
+class MotorHAT(frequency:Double=1600.0,
                i2cAddress:Int=0x60,
                i2cBus:Int=I2CBus.BUS_1) extends AdaFruitPWMI2CBoard[MotorPWMDevice](4, i2cAddress, i2cBus)
 {

@@ -42,15 +42,36 @@ object RPiMain
     testSenseHatDisplayRandomColors
     testSenseHatSensors
     testPWMHatServo
+    testSenseHatDisplyChar
+  }
+
+  def testSenseHatDisplyChar:Unit=
+  {
+    println("test display char")
+    import psksvp.Symbols.AsciiBitmap
+    import scala.util.Random
+    import psksvp.RPi.SenseHAT
+    val rdGen = new Random
+    val display = SenseHAT.display
+    display.drawString("psksvp@gmail.com", (0, 0, 255))
+    for(i <- 0 to 255)
+    {
+      val r = rdGen.nextInt(256)
+      val g = rdGen.nextInt(256)
+      val b = rdGen.nextInt(256)
+      display.clear
+      display.drawBitmap(AsciiBitmap(i), (r,g,b))
+      display.update
+      Thread.sleep(1000)
+    }
   }
 
   def testSenseHatDisplayRotate:Unit=
   {
-    import psksvp.RPi.SenseHat
-    val display = SenseHat.display
+    import psksvp.RPi.SenseHAT
+    val display = SenseHAT.display
     val index = (0 to 7)
     display.clear
-
     for(i <- index)
     {
       display.setPixel(3, i, (255, 0, 0))
@@ -77,9 +98,9 @@ object RPiMain
   {
     println("testDisplayRandomColors")
     import scala.util.Random
-    import psksvp.RPi.SenseHat
+    import psksvp.RPi.SenseHAT
     val rdGen = new Random
-    val display = SenseHat.display
+    val display = SenseHAT.display
     val index = (0 to 7)
     var cnt = 0
     while(cnt < 5)
@@ -100,8 +121,8 @@ object RPiMain
 
   def testSenseHatSensors:Unit=
   {
-    import psksvp.RPi.SenseHat
-    val sensors = SenseHat.sensors
+    import psksvp.RPi.SenseHAT
+    val sensors = SenseHAT.sensors
     var m = 10
     while(m > 0)
     {
@@ -151,31 +172,26 @@ object RPiMain
 
   def testSenseHatStick:Unit=
   {
-    import psksvp.RPi.SenseHat
-    val display = SenseHat.display
+    import psksvp.RPi.SenseHAT
+    val display = SenseHAT.display
     val index = (0 to 7)
     display.clear
-
-    for(i <- index)
-    {
-      display.setPixel(3, i, (255, 0, 0))
-      display.setPixel(4, i, (0, 0, 255))
-      display.setPixel(i, 0, (0, 255, 0))
-    }
+    display.drawBitmap(0x18182424427E4242L, (255, 0, 0))
+    display.update
 
     println("test sense stick\nmove the stick to test\npush down to exit")
-    val stick = SenseHat.stick
+    val stick = SenseHAT.stick
     var code = stick.read
-    while(SenseHat.kENTER != code)
+    while(SenseHAT.kENTER != code)
     {
       println(code)
       code match
       {
-        case SenseHat.kUP    => display.setRotation(0)
-        case SenseHat.kLEFT  => display.setRotation(270)
-        case SenseHat.kRIGHT => display.setRotation(90)
-        case SenseHat.kDOWN  => display.setRotation(180)
-        case _              =>
+        case SenseHAT.kUP    => display.setRotation(0)
+        case SenseHAT.kLEFT  => display.setRotation(270)
+        case SenseHAT.kRIGHT => display.setRotation(90)
+        case SenseHAT.kDOWN  => display.setRotation(180)
+        case _               =>
       }
 
       code = stick.read
@@ -185,12 +201,24 @@ object RPiMain
   def testPWMHatServo:Unit=
   {
     println("TestServo PWM")
-    import psksvp.RPi.{Servo, PWMHat}
+    import psksvp.RPi.{Servo, PWMHAT}
     val servo1 = Servo(armAngleRange = (0 to 180))
     val servo0 = Servo(armAngleRange = (0 to 180))
-    val pwmHat = new PWMHat
+    val pwmHat = new PWMHAT
     pwmHat.attachDevice(servo1, channel=0)
     pwmHat.attachDevice(servo0, channel=3)
+
+    while(true)
+    {
+      print("enter an angle:")
+      val angle = scala.io.StdIn.readInt()
+      servo0.set(angle)
+      servo1.set(angle)
+    }
+  }
+
+
+    /*
     var pos = 0
     while(pos <= 90)
     {
@@ -215,5 +243,5 @@ object RPiMain
       Thread.sleep(1000)
       cnt = cnt - 1
     }
-  }
+  } */
 }
