@@ -162,43 +162,92 @@ object SenseHAT
     {
       import java.lang.Long
       val bin = ("0" * Long.numberOfLeadingZeros(bits)) + bits.toBinaryString
-      // a bit lazy
-      val index = 0 to 7
-      var i = 0
-      for (y <- index; x <- index)
-      {
-        if('1' == bin(i))
-          setPixel(x, y, color)
-
-        i = i + 1
-      }
+      drawBitmap(bin, color)
     }
 
-    def drawBitmap(bits:String, color:(Int, Int, Int)):Unit=
+    def drawBitmap(bits:String, color:(Int, Int, Int), offset:(Int, Int)=(0,0)):Unit=
     {
       require(64 == bits.length)
-
       val index = 0 to 7
       var i = 0
       for (y <- index; x <- index)
       {
-        if('1' == bits(i))
-          setPixel(x, y, color)
+        if ('1' == bits(i))
+        {
+          val dx = x + offset._1
+          val dy = y + offset._2
+          if(dx >= 0 && dx < 8 && dy >= 0 && dy < 8)
+            setPixel(dx, dy, color)
+        }
         i = i + 1
       }
     }
 
-    def drawChar(c:Char, color:(Int, Int, Int), sleep:Int=0):Unit=
+    def drawChar(c:Char, color:(Int, Int, Int), slide:Int=0):Unit=
     {
       import psksvp.Symbols.AsciiBitmap
-      clear
-      drawBitmap(AsciiBitmap(c.toInt), color)
-      update
-      if(sleep > 0)
-        Thread.sleep(sleep)
+      if(0 == slide)
+      {
+        clear
+        drawBitmap(AsciiBitmap(c.toInt), color)
+        update
+      }
+      else
+      {
+        for (sx <- (0 to 7))
+        {
+          clear
+          drawBitmap(AsciiBitmap(c.toInt), color, offset = (-sx, 0))
+          update
+          if (slide > 0)
+            Thread.sleep(slide)
+        }
+      }
     }
 
-    def drawString(s:String, color:(Int, Int, Int)):Unit=s.foreach(drawChar(_, color, 1000))
+    def drawString(s:String, color:(Int, Int, Int), speed:Int=100):Unit=
+    {
+      import psksvp.Math.RowMajor
+      val rowMajor = new RowMajor(8 * s.length, 8)
+      val index = 0 to 7
+
+      def makeFrame(s:String):Array[Char]=
+      {
+        import psksvp.Symbols.AsciiBitmap
+        val bigBits = Array.ofDim[Char](8 * s.length * 8)
+        var sx = 0
+        for (c <- s)
+        {
+          var i = 0
+          val charBits = AsciiBitmap(c)
+          for (y <- index; x <- index)
+          {
+            bigBits(rowMajor.offset(x + sx, y)) = charBits(i)
+            i = i + 1
+          }
+          sx = sx + 8
+        }
+        bigBits
+      }
+
+      def drawFrame(bits:Array[Char], offset:Int):Unit=
+      {
+        for (y <- index; x <- index)
+        {
+          if ('1' == bits(rowMajor.offset(x + offset, y)))
+            setPixel(x, y, color)
+        }
+      }
+
+      val wholeFrame = makeFrame(s)
+      for(sx <- 0 to (8 * s.length) - 8)
+      {
+        clear
+        drawFrame(wholeFrame, sx)
+        update
+        Thread.sleep(speed)
+      }
+    }
   }
 
   private var ledDisplay:Option[LEDDisplay] = None
@@ -241,24 +290,7 @@ object SenseHAT
     class SensorValues(data:SensorData)
     {
       case class Environment(humidity:Double, pressure:Double, height:Double, temperature:Double)
-      {
-        override def toString:String=
-        {
-          "humidity     -> " + humidity + "\n" +
-          "pressure     -> " + pressure + "\n" +
-          "height       -> " + height + "\n" +
-          "temperature  -> " + temperature
-        }
-      }
       case class Orientation(roll:Double, pitch:Double, yaw:Double)
-      {
-        override def toString:String=
-        {
-          "roll     -> " + roll + "\n" +
-          "pitch    -> " + pitch + "\n" +
-          "yaw      -> " + yaw
-        }
-      }
 
       def valid=data.getValid
       def environment = Environment(data.getHumidity, data.getPressure,data.getHeight, data.getTemperature)

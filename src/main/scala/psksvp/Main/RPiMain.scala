@@ -37,11 +37,11 @@ object RPiMain
 {
   def main(args:Array[String]):Unit=
   {
-    testSenseHatStick
-    testSenseHatDisplayRotate
-    testSenseHatDisplayRandomColors
-    testSenseHatSensors
-    testPWMHatServo
+    //testSenseHatStick
+    //testSenseHatDisplayRotate
+    //testSenseHatDisplayRandomColors
+    //testSenseHatSensors
+    //testPWMHatServo
     testSenseHatDisplyChar
   }
 
@@ -53,7 +53,7 @@ object RPiMain
     import psksvp.RPi.SenseHAT
     val rdGen = new Random
     val display = SenseHAT.display
-    display.drawString("psksvp@gmail.com", (0, 0, 255))
+    display.drawString("Risa.Suvanpong@gmail.com", (0, 0, 255))
     for(i <- 0 to 255)
     {
       val r = rdGen.nextInt(256)
