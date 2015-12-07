@@ -1,5 +1,6 @@
 JNI_INCLUDE=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/include
 JNI_LINUX=$(JNI_INCLUDE)/linux
+CWD=$(shell pwd)
 
 PiSensors:PiSensors.h PiSensors.cpp main.cpp
 	g++ -Wall PiSensors.cpp main.cpp -lRTIMULib -omain
@@ -20,8 +21,7 @@ BuildPiSensorsJAR:BuildPiSensorsJNI
 	rm -rf psksvp
 
 RunTest:test.scala BuildPiSensorsJAR
-	export LD_LIBRARY_PATH=/home/pi/workspace/rpi
-	scala -Djava.library.path=/home/pi/workspace/rpi -classpath PiSensors.jar test.scala
+	scala -Djava.library.path=$(CWD) -classpath PiSensors.jar test.scala
 
 all:BuildPiSensorsJNI BuildPiSensorsJAR
 
