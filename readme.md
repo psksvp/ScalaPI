@@ -1,9 +1,9 @@
 # ScalaPI: Interfacing Rasberry PI hardware with Scala#
 
 Scala classes to control the 
-1) SenseHAT  (https://www.raspberrypi.org/products/sense-hat/)
-2) Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
-3) Stepper Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
+* SenseHAT  (https://www.raspberrypi.org/products/sense-hat/)
+* Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
+* Stepper Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
  
 There is no documentation yet, please look at the example code below. 
 
@@ -106,17 +106,6 @@ object RPiMain
       sensors.poll match
       {
         case Some(data) =>
-          /*
-          println("----Environment------")
-          println(data.environment)
-          println("----IMU gyro--------------")
-          println(data.gyro)
-          println("----IMU accelerometer-----")
-          println(data.accelerometer)
-          println("----IMU pose-----")
-          println(data.pose)
-          println("----IMU compass-----")
-          println(data.compass) */
           println("====================================================")
           println("humidity     -> " + data.environment.humidity)
           println("pressure     -> " + data.environment.pressure)
