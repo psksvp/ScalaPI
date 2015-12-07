@@ -31,9 +31,58 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
-object testRpiSensors
+///////////////////////////////////////////////////////////////
+object EntryPoint
 {
+  /*
+    SensorDevice wraps the uglyness of java getBah.. 
+  */
+  class SensorDevice
+  {
+    import psksvp.jni.rpi.{PiSensors, SensorData}
+    class SensorValues(data:SensorData)
+    {
+      case class Environment(humidity:Double, pressure:Double, height:Double, temperature:Double)
+      case class Orientation(roll:Double, pitch:Double, yaw:Double)
+
+      def valid=data.getValid
+      def environment = Environment(data.getHumidity, data.getPressure,data.getHeight, data.getTemperature)
+      def gyro = Orientation(data.getGyro.getRoll, data.getGyro.getPitch, data.getGyro.getYaw)
+      def accelerometer = Orientation(data.getAccel.getRoll, data.getAccel.getPitch, data.getAccel.getYaw)
+      def pose = Orientation(data.getPose.getRoll, data.getPose.getPitch, data.getPose.getYaw)
+      def compass = Orientation(data.getCompass.getRoll, data.getCompass.getPitch, data.getCompass.getYaw)
+    }
+
+    def init:Boolean=
+    {
+      try
+      {
+        System.loadLibrary("PiSensors")
+        PiSensors.start()
+      }
+      catch
+      {
+        case e:UnsatisfiedLinkError => println("Native code library failed to load.\n" + e)
+                                       false
+      }
+    } // class SensorDevice
+
+    def deinit:Unit=PiSensors.stop()
+    def poll:Option[SensorValues]=
+    {
+      val data = new SensorValues(PiSensors.poll())
+      if(data.valid)
+        Some(data)
+      else
+      {
+        println("SenseHat.pollSensors data are not valid")
+        None
+      }
+    }
+  }
+  
+  //////////////////////////////////////////////
+  ////
   def main(args:Array[String]):Unit=
   {
     try 
@@ -42,6 +91,7 @@ object testRpiSensors
       //System.setProperty("java.library.path", cwd.getCanonicalPath)
       //println("setting java.library.path to " + cwd.getCanonicalPath)
       System.loadLibrary("PiSensors")
+      println("loaded PiSensors.so")
     } 
     catch
     {
@@ -50,39 +100,45 @@ object testRpiSensors
         System.exit(1)
     } 
     
-    import psksvp.jni.rpi._
-    PiSensors.start()
-    var cnt = 100
-    while(cnt > 0)
+    val sensorDevice = new SensorDevice
+    if(true == sensorDevice.init)
     {
-      val data = PiSensors.poll
-      if(true == data.getValid)
+      var cnt = 100
+      while(cnt > 0)
       {
-        println("humidity     -> " + data.getHumidity)
-        println("pressure     -> " + data.getPressure)
-        println("height       -> " + data.getHeight)
-        println("temperature  -> " + data.getTemperature)
-        
-        println("pos roll     -> " + data.getPose.getRoll)
-        println("pos pitch    -> " + data.getPose.getPitch)
-        println("pos yaw      -> " + data.getPose.getYaw)
-        
-        println("gyro roll    -> " + data.getGyro.getRoll)
-        println("gyro pitch   -> " + data.getGyro.getPitch)
-        println("gyro yaw     -> " + data.getGyro.getYaw)
-        
-        println("accel roll   -> " + data.getAccel.getRoll)
-        println("accel pitch  -> " + data.getAccel.getPitch)
-        println("accel yaw    -> " + data.getAccel.getYaw)
-        
-        println("compass roll -> " + data.getCompass.getRoll)
-        println("compass pitch-> " + data.getCompass.getPitch)
-        println("compass yaw  -> " + data.getCompass.getYaw)
-        println("============================================")
-      }
-      cnt = cnt - 1
-    }
-    
-    PiSensors.stop()
+        sensorDevice.poll match
+        {
+          case Some(data) =>
+            println("====================================================")
+            println("humidity     -> " + data.environment.humidity)
+            println("pressure     -> " + data.environment.pressure)
+            println("height       -> " + data.environment.height)
+            println("temperature  -> " + data.environment.temperature)
+          
+            println("pos roll     -> " + data.pose.roll)
+            println("pos pitch    -> " + data.pose.pitch)
+            println("pos yaw      -> " + data.pose.yaw)
+          
+            println("gyro roll    -> " + data.gyro.roll)
+            println("gyro pitch   -> " + data.gyro.pitch)
+            println("gyro yaw     -> " + data.gyro.yaw)
+          
+            println("accel roll   -> " + data.accelerometer.roll)
+            println("accel pitch  -> " + data.accelerometer.pitch)
+            println("accel yaw    -> " + data.accelerometer.yaw)
+          
+            println("compass roll -> " + data.compass.roll)
+            println("compass pitch-> " + data.compass.pitch)
+            println("compass yaw  -> " + data.compass.yaw)
+          case None       => println("sensors poll fail")
+        } //match
+        cnt = cnt - 1
+      } //while
+      
+      sensorDevice.deinit
+    } 
   }
 }
+
+
+

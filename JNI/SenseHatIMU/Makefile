@@ -21,7 +21,7 @@ BuildPiSensorsJAR:BuildPiSensorsJNI
 	rm -rf psksvp
 
 RunTest:test.scala BuildPiSensorsJAR
-	scala -Djava.library.path=$(CWD) -classpath PiSensors.jar test.scala
+	scala -Djava.library.path=$(CWD) -classpath PiSensors.jar  test.scala
 
 all:BuildPiSensorsJNI BuildPiSensorsJAR
 
