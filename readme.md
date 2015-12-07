@@ -1,14 +1,13 @@
 # ScalaPI: Interfacing Rasberry PI hardware with Scala#
 
-TODO: write below better than this.
+Scala classes to control the 
+1) SenseHAT  (https://www.raspberrypi.org/products/sense-hat/)
+2) Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
+3) Stepper Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
+ 
+There is no documentation yet, please look at the example code below. 
 
-I hate snake which is commonly used on the PI, but I like Scala and want to use this for my Robotic boat. 
-Bah bah bah ... if you are a scala programmer, the example code below will make more sense than bah bah bah
-
-currently it requires pi4j (https://github.com/Pi4J/pi4j) for i2c, but I will eventually remove, becasue of incompatible license.
-
-TODO:  include sbt buit script.
-
+To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU
 
 ```
 object RPiMain
@@ -19,8 +18,8 @@ object RPiMain
     testSenseHatDisplayRotate
     testSenseHatDisplayRandomColors
     testSenseHatSensors
-    testPWMHatServo
     testSenseHatDisplyChar
+    testPWMHatServo
   }
 
   def testSenseHatDisplyChar:Unit=

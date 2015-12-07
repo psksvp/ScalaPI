@@ -34,9 +34,9 @@
 ///////////////////////////////////////////////////////////////
 object EntryPoint
 {
-  /*
+  /*************************************************
     SensorDevice wraps the uglyness of java getBah.. 
-  */
+  **************************************************/
   class SensorDevice
   {
     import psksvp.jni.rpi.{PiSensors, SensorData}
