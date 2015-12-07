@@ -1,7 +1,7 @@
 # ScalaPI: Interfacing Rasberry PI hardware with Scala#
 
 Scala classes to control the 
-* SenseHAT  (https://www.raspberrypi.org/products/sense-hat/)
+* SenseHAT  https://www.raspberrypi.org/products/sense-hat/
 * Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
 * Stepper Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
  
