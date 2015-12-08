@@ -120,28 +120,27 @@ object RPiMain
     {
       sensors.poll match
       {
-        case Some(data) =>
-          println("====================================================")
-          println("humidity     -> " + data.environment.humidity)
-          println("pressure     -> " + data.environment.pressure)
-          println("height       -> " + data.environment.height)
-          println("temperature  -> " + data.environment.temperature)
-
-          println("pos roll     -> " + data.pose.roll)
-          println("pos pitch    -> " + data.pose.pitch)
-          println("pos yaw      -> " + data.pose.yaw)
-
-          println("gyro roll    -> " + data.gyro.roll)
-          println("gyro pitch   -> " + data.gyro.pitch)
-          println("gyro yaw     -> " + data.gyro.yaw)
-
-          println("accel roll   -> " + data.accelerometer.roll)
-          println("accel pitch  -> " + data.accelerometer.pitch)
-          println("accel yaw    -> " + data.accelerometer.yaw)
-
-          println("compass roll -> " + data.compass.roll)
-          println("compass pitch-> " + data.compass.pitch)
-          println("compass yaw  -> " + data.compass.yaw)
+        case Some(data) => println("humidity     -> " + data.environment.humidity)
+                           println("pressure     -> " + data.environment.pressure)
+                           println("height       -> " + data.environment.height)
+                           println("temperature  -> " + data.environment.temperature)
+                           
+                           println("pos roll     -> " + data.pose.roll)
+                           println("pos pitch    -> " + data.pose.pitch)
+                           println("pos yaw      -> " + data.pose.yaw)
+                           
+                           println("gyro roll    -> " + data.gyro.roll)
+                           println("gyro pitch   -> " + data.gyro.pitch)
+                           println("gyro yaw     -> " + data.gyro.yaw)
+                           
+                           println("accel roll   -> " + data.accelerometer.roll)
+                           println("accel pitch  -> " + data.accelerometer.pitch)
+                           println("accel yaw    -> " + data.accelerometer.yaw)
+                           
+                           println("compass roll -> " + data.compass.roll)
+                           println("compass pitch-> " + data.compass.pitch)
+                           println("compass yaw  -> " + data.compass.yaw)
+                           println("====================================================")
         case None       => println("sensors poll fail")
       }
       Thread.sleep(1000)
@@ -197,33 +196,5 @@ object RPiMain
       servo1.set(angle)
     }
   }
-
-
-    /*
-    var pos = 0
-    while(pos <= 90)
-    {
-      println("Angle -> " + pos)
-      servo1.set(pos)
-      servo0.set(pos)
-      Thread.sleep(1000)
-      pos = pos + 1
-    }
-
-    import scala.util.Random
-    val rdGen = new Random
-    var cnt = 10
-    while(cnt >= 0)
-    {
-      val a1 = rdGen.nextInt(180)
-      val a2 = rdGen.nextInt(180)
-      println("Angles -> " + a1 + " " + a2)
-      servo0.set(a1)
-      Thread.sleep(1000)
-      servo1.set(a2)
-      Thread.sleep(1000)
-      cnt = cnt - 1
-    }
-  } */
 }
 ```
