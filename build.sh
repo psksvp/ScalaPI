@@ -1,4 +1,5 @@
 #!/bin/sh
+mkdir -p lib
 cd JNI/SenseHatIMU
 make all
 cd ../../lib
