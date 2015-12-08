@@ -2,12 +2,27 @@
 
 Scala classes to control the 
 * SenseHAT  https://www.raspberrypi.org/products/sense-hat/
-* Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
+* Adafruit PWM HAT https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
 * Adafruit Stepper/DC Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
  
+## Requirements
+* Scala 2.11.7 or > (http://downloads.typesafe.com/scala/2.11.7/scala-2.11.7.deb?_ga=1.154127736.1386774362.1448663611)
+* sbt (https://dl.bintray.com/sbt/debian/sbt-0.13.9.deb)
+* pi4j (http://pi4j.com). Normall it is already installed in /opt/pi4j with RASPBIAN JESSIE
+* SenseHAT IMU lib. RASPBIAN JESSIE has this by default.
+
+## Build
+At command prompt on raspberry pi, run build.sh
+To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU
+
+```
+export LD_LIBRARY_PATH=absolute path to PiSensor.so, 
+```
+
+## Sample code
 There is no documentation yet, please look at the example code below. 
 
-To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU
+
 
 ```
 object RPiMain
