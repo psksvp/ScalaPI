@@ -12,8 +12,9 @@ Scala classes to control the
 * SenseHAT IMU lib. RASPBIAN JESSIE has this by default.
 
 ## Build
-At command prompt on raspberry pi, run build.sh
-To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU
+At command prompt on raspberry pi, run build.sh.
+
+To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU.
 
 ```
 export LD_LIBRARY_PATH=(absolute path to PiSensor.so in JNI/SenseHatIMU)
