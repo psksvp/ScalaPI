@@ -3,7 +3,7 @@
 Scala classes to control the 
 * SenseHAT  https://www.raspberrypi.org/products/sense-hat/
 * Adafruit PWM https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
-* Stepper Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
+* Adafruit Stepper/DC Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
  
 There is no documentation yet, please look at the example code below. 
 
