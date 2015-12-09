@@ -28,6 +28,7 @@ The BSD 3-Clause License
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   **/
+
 package psksvp.Main
 
 /**
@@ -37,12 +38,12 @@ object RPiMain
 {
   def main(args:Array[String]):Unit=
   {
-    //testSenseHatStick
-    //testSenseHatDisplayRotate
-    //testSenseHatDisplayRandomColors
-    //testSenseHatSensors
-    //testPWMHatServo
-    testSenseHatDisplyChar
+    testSenseHatStick
+    testSenseHatDisplayRotate
+    testSenseHatDisplayRandomColors
+    testSenseHatSensors
+    testPWMHatServo
+    //testSenseHatDisplyChar
   }
 
   def testSenseHatDisplyChar:Unit=
@@ -53,7 +54,7 @@ object RPiMain
     import psksvp.RPi.SenseHAT
     val rdGen = new Random
     val display = SenseHAT.display
-    display.drawString("Risa.Suvanpong@gmail.com", (0, 0, 255))
+    display.drawString("psksvp@gmail.com", (0, 0, 255))
     for(i <- 0 to 255)
     {
       val r = rdGen.nextInt(256)
@@ -62,7 +63,7 @@ object RPiMain
       display.clear
       display.drawBitmap(AsciiBitmap(i), (r,g,b))
       display.update
-      Thread.sleep(1000)
+      Thread.sleep(150)
     }
   }
 
@@ -216,4 +217,32 @@ object RPiMain
       servo1.set(angle)
     }
   }
+
+
+    /*
+    var pos = 0
+    while(pos <= 90)
+    {
+      println("Angle -> " + pos)
+      servo1.set(pos)
+      servo0.set(pos)
+      Thread.sleep(1000)
+      pos = pos + 1
+    }
+
+    import scala.util.Random
+    val rdGen = new Random
+    var cnt = 10
+    while(cnt >= 0)
+    {
+      val a1 = rdGen.nextInt(180)
+      val a2 = rdGen.nextInt(180)
+      println("Angles -> " + a1 + " " + a2)
+      servo0.set(a1)
+      Thread.sleep(1000)
+      servo1.set(a2)
+      Thread.sleep(1000)
+      cnt = cnt - 1
+    }
+  } */
 }

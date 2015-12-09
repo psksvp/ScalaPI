@@ -304,6 +304,9 @@ object SenseHAT
     {
       try
       {
+        val cwd = (new java.io.File(".")).getCanonicalPath()
+        println("setting java.library.path -> " + cwd)
+        System.setProperty("java.library.path", cwd)
         System.loadLibrary("PiSensors")
         PiSensors.start()
       }
