@@ -216,32 +216,4 @@ object RPiMain
       servo1.set(angle)
     }
   }
-
-
-    /*
-    var pos = 0
-    while(pos <= 90)
-    {
-      println("Angle -> " + pos)
-      servo1.set(pos)
-      servo0.set(pos)
-      Thread.sleep(1000)
-      pos = pos + 1
-    }
-
-    import scala.util.Random
-    val rdGen = new Random
-    var cnt = 10
-    while(cnt >= 0)
-    {
-      val a1 = rdGen.nextInt(180)
-      val a2 = rdGen.nextInt(180)
-      println("Angles -> " + a1 + " " + a2)
-      servo0.set(a1)
-      Thread.sleep(1000)
-      servo1.set(a2)
-      Thread.sleep(1000)
-      cnt = cnt - 1
-    }
-  } */
 }
