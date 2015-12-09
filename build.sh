@@ -5,8 +5,8 @@ make all
 cd ../i2c
 make all
 cd ../../lib
-ln -s ../JNI/PiI2C/PiI2C.jar .
-ln -s ../JNI/PiI2C/libPiI2C.so .
+ln -s ../JNI/i2c/PiI2C.jar .
+ln -s ../JNI/i2c/libPiI2C.so .
 ln -s ../JNI/SenseHatIMU/PiSensors.jar .
 ln -s ../JNI/SenseHatIMU/libPiSensors.so .
 ln -s /opt/pi4j/lib/pi4j-core.jar .
