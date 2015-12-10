@@ -3,10 +3,7 @@ package psksvp.RPi
 /**
   * Created by psksvp on 5/12/2015.
   */
-import com.pi4j.io.i2c.I2CBus
-abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int,
-                                                   i2cAddress:Int,
-                                                   i2cBus:Int=I2CBus.BUS_1)
+abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int)
 {
   private val ports = Array.ofDim[Option[T]](16)
   for(i <- ports.indices)
@@ -48,5 +45,4 @@ abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int,
 
   def numberOfChannels=nChennels
   def address=i2cAddress
-  def bus=i2cBus
 }

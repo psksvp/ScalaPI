@@ -31,8 +31,6 @@ The BSD 3-Clause License
 
 package psksvp.RPi
 
-import com.pi4j.io.i2c.I2CBus
-
 /**
   * Created by psksvp on 26/11/2015.
   *
@@ -42,9 +40,8 @@ import com.pi4j.io.i2c.I2CBus
   * many PWM hats can be stacked as long as they use different i2c address.
   */
 class PWMHAT(frequency:Double=60.0,
-             i2cAddress:Int=0x40,
-             i2cBus:Int=I2CBus.BUS_1) extends AdaFruitPWMI2CBoard[RangePWMDevice](16, i2cAddress,i2cBus)
+             i2cAddress:Int=0x40) extends AdaFruitPWMI2CBoard[RangePWMDevice](16, i2cAddress)
 {
-  private val pwm = new PWMController(frequency, i2cAddress, i2cBus)
+  private val pwm = new PWMController(frequency, i2cAddress)
   override def pwmController=pwm
 }
