@@ -31,8 +31,8 @@ class PWMController(frequency:Double, i2cAddress:Int,  i2cBus:Int=I2CBus.BUS_1)
   private val kInvert:Byte  = 0x10
   private val kOutDrv:Byte  = 0x04
 
-  private val generalCallI2C = I2CFactory.getInstance(i2cBus).getDevice(0x00)
-  private val device = I2CFactory.getInstance(i2cBus).getDevice(i2cAddress)
+  private val generalCallI2C = I2C.connect(0x00)//I2CFactory.getInstance(i2cBus).getDevice(0x00)
+  private val device = I2C.connect(i2cAddress)//I2CFactory.getInstance(i2cBus).getDevice(i2cAddress)
   sendToAllChannel(0, 0)
   device.write(kMode2, kOutDrv)
   device.write(kMode1, kAllCall)
