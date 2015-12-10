@@ -8,7 +8,6 @@ Scala classes to control the
 ## Requirements
 * Scala 2.11.7 or > ("http://downloads.typesafe.com/scala/2.11.7/scala-2.11.7.deb?_ga=1.154127736.1386774362.1448663611")
 * sbt (https://dl.bintray.com/sbt/debian/sbt-0.13.9.deb)
-* pi4j (http://pi4j.com). Normall it is already installed in /opt/pi4j with RASPBIAN JESSIE
 * SenseHAT IMU lib. RASPBIAN JESSIE has this by default.
 
 ## Build
