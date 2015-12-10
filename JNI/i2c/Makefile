@@ -4,7 +4,7 @@ CWD=$(shell pwd)
 
 GenI2CJNI:PiI2C.i
 	swig -Wall -java -package psksvp.jni.rpi PiI2C.i
-	gcc -shared -I$(JNI_INCLUDE) -I$(JNI_LINUX) PiI2C_wrap.c -o libPiI2C.so
+	gcc -shared -I$(JNI_INCLUDE) -I$(JNI_LINUX) PiI2C_wrap.c -o libPiI2C.so -lwiringPiDev
 
 BuildPiI2CJAR:GenI2CJNI	
 	mkdir -p psksvp/jni/rpi
