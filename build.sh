@@ -14,5 +14,6 @@ ln -s /opt/pi4j/lib/pi4j-device.jar .
 ln -s /opt/pi4j/lib/pi4j-service.jar .
 cd ..
 cp JNI/SenseHatIMU/*.so .
+cp JNI/i2c/*.so .
 sbt compile
 sbt run
