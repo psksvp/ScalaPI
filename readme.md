@@ -240,4 +240,5 @@ object RPiMain
 ## Contact 
 pongsak suvanpong (psksvp@gmail.com)
 ## Acknowledgement
-Use code from https://github.com/adamheinrich/native-utils
+* Use code from https://github.com/adamheinrich/native-utils for loading shared lib from jar.
+* The native libs use wiringPi (http://wiringpi.com) and RTIMUlib (https://github.com/richards-tech/RTIMULib)
