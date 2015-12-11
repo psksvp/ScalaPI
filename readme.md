@@ -9,6 +9,7 @@ Scala classes to control the
 * Scala 2.11.7 or > ("http://downloads.typesafe.com/scala/2.11.7/scala-2.11.7.deb?_ga=1.154127736.1386774362.1448663611")
 * sbt (https://dl.bintray.com/sbt/debian/sbt-0.13.9.deb)
 * SenseHAT IMU lib. RASPBIAN JESSIE has this by default.
+* Swig 3.xx to build
 
 ## Build
 At command prompt on raspberry pi, run build.sh. The script will build ScalaPi.jar. A prebuilt jar is also provided.

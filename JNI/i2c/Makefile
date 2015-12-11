@@ -1,6 +1,5 @@
 JNI_INCLUDE=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/include
 JNI_LINUX=$(JNI_INCLUDE)/linux
-CWD=$(shell pwd)
 
 GenI2CJNI:PiI2C.i
 	swig -java -package psksvp.jni.rpi PiI2C.i

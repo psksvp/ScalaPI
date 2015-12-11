@@ -1,4 +1,4 @@
-/* File : wiringI2C.i */
+/* File : PiI2C.i */
 %module PiI2C
 
 %{
