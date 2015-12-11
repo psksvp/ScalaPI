@@ -209,6 +209,7 @@ object RPiMain
   def testGPIO:Unit=
   {
     import psksvp.RPi.GPIO
-    val outPin = GPIO.getPin(GPIO.Output(), 0)
+    val outPin = GPIO.pinForOutput(0)
+
   }
 }

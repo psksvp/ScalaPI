@@ -38,7 +38,20 @@ object GPIO
   import psksvp.FileSystem.SimpleFileIO
   import psksvp.jni.rpi.{PiGPIO, PiGPIOConstants}
 
-  SimpleFileIO.loadNativeLibraryFromJar("/native/libPiSensors.so")
+  private var init=false
+  try
+  {
+    if(false == init)
+    {
+      import psksvp.FileSystem.SimpleFileIO
+      SimpleFileIO.loadNativeLibraryFromJar("/native/libPiGPIO.so")
+      init = true
+    }
+  }
+  catch
+    {
+      case e:UnsatisfiedLinkError => sys.error("Native code library failed to load.\n" + e)
+    }
 
   abstract class PinMode(wiringPiCode:Int)
   {
@@ -109,14 +122,9 @@ object GPIO
 
   class GPIOClockOutputPin extends OutputPin(7, GPIOClock())
 
-  def getPin(mode:PinMode, pinNo:Int):Pin=
-  {
-    mode match
-    {
-      case Input() => new InputPin(pinNo)
-      case Output() => new OutputPin(pinNo)
-      case PWMOutput() => new PWMOutputPin
-      case GPIOClock() => new GPIOClockOutputPin
-    }
-  }
+
+  def pinForOutput(pin:Int)= new OutputPin(pin)
+  def pinInput(pin:Int)= new InputPin(pin)
+  def pinForPWMOutput= new PWMOutputPin
+  def pinForGPIOClockOutput= new GPIOClockOutputPin
 }
