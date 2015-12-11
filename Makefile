@@ -1,32 +1,31 @@
 makeNativeLibs:
-	make -C ./JNI/SenseHatIMU/make all
-	make -C ./JNI/i2c/make all
-	make -C ./JNI/GPIO/make all
+	cd ./JNI/SenseHatIMU && $(MAKE) all
+	cd ./JNI/i2c && $(MAKE) all
+	cd ./JNI/GPIO && $(MAKE) all
 	
-makeSymLink: makeNativeLibs
-	ln -s ./JNI/i2c/PiI2C.jar                ./lib/.
-	ln -s ./JNI/SenseHatIMU/PiSensors.jar    ./lib/.
-	ln -s ./JNI/GPIO/PiGPIO.jar              ./lib/.
+copyNativeToLib: makeNativeLibs
+	cp ./JNI/i2c/PiI2C.jar                ./lib/.
+	cp ./JNI/SenseHatIMU/PiSensors.jar    ./lib/.
+	cp ./JNI/GPIO/PiGPIO.jar              ./lib/.
 	
-compileScalaCode: makeSymLink
+compileScalaCode: copyNativeToLib
 	sbt compile
 	sbt package
-	
+
 buildJAR: compileScalaCode
 	rm -f ScalaPi.jar
 	mkdir -p temp
-	cd temp
-	rm -f *
-	unzip ../target/scala-2.11/scalapi_2.11-0.1.jar
-	unzip -n ../lib/PiSensors.jar
-	unzip -n ../lib/PiI2C.jar
-	unzip -n ../lib/PiGPIO.jar
-	mkdir native
-	cd native
-	cp ../../JNI/i2c/libPiI2C.so .
-	cp ../../JNI/SenseHatIMU/libPiSensors.so .
-	cp ../../JNI/GPIO/libPiGPIO.so .
-	cd ../
-	jar cvfm ScalaPi.jar ../MANIFEST.MF .
-	mv ScalaPi.jar ../.
+	rm -f ./temp/*
+	mkdir -p ./temp/native
+	cp ../../JNI/i2c/libPiI2C.so ./temp/native/.
+	cp ../../JNI/SenseHatIMU/libPiSensors.so ./temp/native/.
+	cp ../../JNI/GPIO/libPiGPIO.so ./temp/native/.
+	unzip ../target/scala-2.11/scalapi_2.11-0.1.jar -d ./temp
+	unzip -n ../lib/PiSensors.jar -d ./temp
+	unzip -n ../lib/PiI2C.jar	-d ./temp
+	unzip -n ../lib/PiGPIO.jar -d ./temp
+	jar cvfm ScalaPi.jar MANIFEST.MF ./temp
+
+	
+all: buildJAR
 	
