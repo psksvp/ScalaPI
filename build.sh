@@ -28,5 +28,5 @@ jar cvfm ScalaPi.jar ../MANIFEST.MF .
 mv ScalaPi.jar ../.
 cd ..
 rm -rf temp
-
-
+echo "ScalaPi.jar"
+echo "done .."
