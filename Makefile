@@ -1,7 +1,7 @@
 makeNativeLibs:
-	make -f ./JNI/SenseHatIMU/Makefile
-	make -f ./JNI/i2c/Makefile
-	make -f ./JNI/GPIO/Makefile
+	make -f ./JNI/SenseHatIMU/build.mak
+	make -f ./JNI/i2c/build.mak
+	make -f ./JNI/GPIO/build.mak
 	
 makeSymLink: makeNativeLibs
 	ln -s ./JNI/i2c/PiI2C.jar                ./lib/.
