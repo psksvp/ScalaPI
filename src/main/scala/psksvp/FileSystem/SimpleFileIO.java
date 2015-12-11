@@ -33,12 +33,8 @@ package psksvp.FileSystem;
 /**
  * Created by psksvp on 28/07/2014.
  */
-import sun.java2d.pipe.SpanShapeRenderer;
-
 import java.io.BufferedReader;
-
 import java.io.FileInputStream;
-
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
