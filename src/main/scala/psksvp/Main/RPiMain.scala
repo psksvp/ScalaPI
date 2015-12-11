@@ -205,4 +205,10 @@ object RPiMain
       servo1.set(angle)
     }
   }
+
+  def testGPIO:Unit=
+  {
+    import psksvp.RPi.GPIO
+    val outPin = GPIO.getPin(GPIO.Output(), 0)
+  }
 }

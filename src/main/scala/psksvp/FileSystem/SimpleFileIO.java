@@ -547,7 +547,7 @@ public class SimpleFileIO
             in.close();
         }
     }
-    
+
 
     /**
      * code is taken from https://github.com/adamheinrich/native-utils

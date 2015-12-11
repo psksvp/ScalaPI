@@ -3,7 +3,7 @@ JNI_LINUX=$(JNI_INCLUDE)/linux
 
 GenGPIOJNI:PiGPIO.i
 	swig -java -package psksvp.jni.rpi PiGPIO.i
-	gcc -shared -I$(JNI_INCLUDE) -I$(JNI_LINUX) -lwiringPi PiGPIO_wrap.c -olibPiGPIO.so
+	gcc -shared -I$(JNI_INCLUDE) -I$(JNI_LINUX)  PiGPIO_wrap.c -lwiringPi -lpthread -olibPiGPIO.so
 
 BuildPiGPIOJAR:GenGPIOJNI	
 	mkdir -p psksvp/jni/rpi
