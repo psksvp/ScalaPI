@@ -124,7 +124,7 @@ object GPIO
 
 
   def pinForOutput(pin:Int)= new OutputPin(pin)
-  def pinInput(pin:Int)= new InputPin(pin)
+  def pinForInput(pin:Int)= new InputPin(pin)
   def pinForPWMOutput= new PWMOutputPin
   def pinForGPIOClockOutput= new GPIOClockOutputPin
 }

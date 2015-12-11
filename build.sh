@@ -24,6 +24,7 @@ cd temp
 unzip ../target/scala-2.11/scalapi_2.11-0.1.jar
 unzip -n ../lib/PiSensors.jar
 unzip -n ../lib/PiI2C.jar
+unzip -n ../lib/PiGPIO.jar
 mkdir native
 cd native
 cp ../../JNI/i2c/libPiI2C.so .
