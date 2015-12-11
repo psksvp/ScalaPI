@@ -1,7 +1,7 @@
 JNI_INCLUDE=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/include
 JNI_LINUX=$(JNI_INCLUDE)/linux
 
-GenGPIOJNI:PiI2C.i
+GenGPIOJNI:PiGPIO.i
 	swig -java -package psksvp.jni.rpi PiGPIO.i
 	gcc -shared -I$(JNI_INCLUDE) -I$(JNI_LINUX) -lwiringPi PiGPIO_wrap.c -olibPiGPIO.so
 

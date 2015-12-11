@@ -5,7 +5,7 @@ cd JNI/SenseHatIMU
 make all
 cd ../i2c
 make all
-cd ..GPIO
+cd ../GPIO
 make all
 cd ../../lib
 rm -f *
