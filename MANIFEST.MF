@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Implementation-Title: ScalaPI
+Implementation-Version: 0.1
+Specification-Vendor: default
+Specification-Title: ScalaPI
+Implementation-Vendor-Id: default
+Specification-Version: 0.1
+Implementation-Vendor: default
+Main-Class: psksvp.Main.RPiMain
