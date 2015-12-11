@@ -22,9 +22,11 @@ object I2C
   {
     if(false == init)
     {
-      val cwd = (new java.io.File(".")).getCanonicalPath
-      psksvp.FileSystem.SimpleFileIO.setLibraryPath(cwd)
-      System.loadLibrary("PiI2C")
+      //val cwd = (new java.io.File(".")).getCanonicalPath
+      //psksvp.FileSystem.SimpleFileIO.setLibraryPath(cwd)
+      //System.loadLibrary("PiI2C")
+      import psksvp.FileSystem.SimpleFileIO
+      SimpleFileIO.loadNativeLibraryFromJar("/native/libPiI2C.so")
       init = true
     }
   }

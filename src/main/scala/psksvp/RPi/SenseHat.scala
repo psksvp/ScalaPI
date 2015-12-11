@@ -304,9 +304,13 @@ object SenseHAT
     {
       try
       {
-        val cwd = (new java.io.File(".")).getCanonicalPath
-        psksvp.FileSystem.SimpleFileIO.setLibraryPath(cwd)
-        System.loadLibrary("PiSensors")
+        //val cwd = (new java.io.File(".")).getCanonicalPath
+        //psksvp.FileSystem.SimpleFileIO.setLibraryPath(cwd)
+        //System.loadLibrary("PiSensors")
+
+        import psksvp.FileSystem.SimpleFileIO
+        SimpleFileIO.loadNativeLibraryFromJar("/native/libPiSensors.so")
+
         PiSensors.start()
       }
       catch
