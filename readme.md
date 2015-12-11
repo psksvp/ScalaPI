@@ -11,12 +11,43 @@ Scala classes to control the
 * SenseHAT IMU lib. RASPBIAN JESSIE has this by default.
 
 ## Build
-At command prompt on raspberry pi, run build.sh.
+At command prompt on raspberry pi, run build.sh. The script will build ScalaPi.jar. A prebuilt jar is also provided.
 
-To use SenseHAT IMU, LD_LIBRARY_PATH must be set to JNI/SenseHatIMU.
-
+## REPL example
 ```
-export LD_LIBRARY_PATH=(absolute path to PiSensor.so in JNI/SenseHatIMU)
+pi@raspberrypi ~/workspace/rpi/ScalaPI $ scala -classpath ScalaPi.jar
+Welcome to Scala version 2.11.7 (Java HotSpot(TM) Client VM, Java 1.8.0).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> import psksvp.RPi.SenseHAT
+import psksvp.RPi.SenseHAT
+
+scala> val display = SenseHAT.display
+display: psksvp.RPi.SenseHAT.LEDDisplay = psksvp.RPi.SenseHAT$LEDDisplay@1615099
+
+scala> display.drawString("HelloWorld", (0, 0, 255))
+for(a <- List(0, 90, 180, 270)){ 
+     |   display.setRotation(a)
+     |   Thread.sleep(1000)
+     | }
+scala> import psksvp.RPi.{Servo, PWMHAT}
+import psksvp.RPi.{Servo, PWMHAT}
+
+scala> val pwmHat = new PWMHAT
+pwmHat: psksvp.RPi.PWMHAT = psksvp.RPi.PWMHAT@9d82f9
+
+scala> val servo0 = Servo(armAngleRange = (0 to 180))
+
+scala> pwmHat.attachDevice(servo0, channel=0)
+
+scala> servo0.set(90)
+
+scala> servo0.set(180)
+
+scala> servo0.set(0)
+
+scala> servo0.set(45)
 ```
 
 ## Sample code
@@ -198,3 +229,6 @@ object RPiMain
   }
 }
 ```
+
+## Acknowledgement
+Use code from https://github.com/adamheinrich/native-utils
