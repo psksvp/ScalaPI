@@ -16,7 +16,6 @@ rm -rf temp
 rm -f ScalaPi.jar
 mkdir -p temp
 cd temp
-rm -rf *
 unzip ../target/scala-2.11/scalapi_2.11-0.1.jar
 unzip -n ../lib/PiSensors.jar
 unzip -n ../lib/PiI2C.jar
@@ -28,5 +27,6 @@ cd ../
 jar cvfm ScalaPi.jar ../MANIFEST.MF .
 mv ScalaPi.jar ../.
 cd ..
+rm -rf temp
 
 
