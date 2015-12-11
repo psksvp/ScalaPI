@@ -15,8 +15,9 @@ Scala classes to control the
 * JDK 1.8 RASPBIAN JESSIE has this by default.
 
 ## Build
-The script will build ScalaPi.jar. A prebuilt jar is also provided.
+After cloning this repos, run make all from command line. A prebuilt jar is also provided in the repos.
 ```
+> cd ScalaPi
 > make all
 ```
 
