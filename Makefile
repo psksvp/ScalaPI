@@ -26,7 +26,7 @@ buildJAR: compileScalaCode
 	unzip -n ./lib/PiSensors.jar -d ./temp
 	unzip -n ./lib/PiI2C.jar -d ./temp
 	unzip -n ./lib/PiGPIO.jar -d ./temp
-	cd temp && jar cvfm ScalaPi.jar ../MANIFEST.MF 
+	cd temp && jar cvfm ScalaPi.jar ../MANIFEST.MF . 
 	cp ./temp/ScalaPi.jar ScalaPi.jar
 	rm -rf temp
 
