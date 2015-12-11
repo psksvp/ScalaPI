@@ -2,11 +2,11 @@
 #need to check this into a Makefile
 mkdir -p lib
 cd JNI/SenseHatIMU
-make all
+make -f build.mak all
 cd ../i2c
-make all
+make -f build.mak all
 cd ../GPIO
-make all
+make -f build.mak all
 cd ../../lib
 rm -f *
 ln -s ../JNI/i2c/PiI2C.jar .
