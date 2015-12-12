@@ -38,10 +38,10 @@ object RPiMain
 {
   def main(args:Array[String]):Unit=
   {
-    testSenseHatStick
-    testSenseHatDisplayRotate
-    testSenseHatDisplayRandomColors
-    testSenseHatSensors
+    //testSenseHatStick
+    //testSenseHatDisplayRotate
+    //testSenseHatDisplayRandomColors
+    //testSenseHatSensors
     testPWMHatServo
     //testSenseHatDisplyChar
   }
@@ -192,16 +192,16 @@ object RPiMain
     println("TestServo PWM")
     import psksvp.RPi.{Servo, PWMHAT}
     val servo1 = Servo(armAngleRange = (0 to 180))
-    val servo0 = Servo(armAngleRange = (0 to 180))
+    //val servo0 = Servo(armAngleRange = (0 to 180))
     val pwmHat = new PWMHAT
-    pwmHat.attachDevice(servo1, channel=0)
-    pwmHat.attachDevice(servo0, channel=15)
+    pwmHat.attachDevice(servo1, channel=12)
+    //pwmHat.attachDevice(servo0, channel=15)
 
     while(true)
     {
       print("enter an angle:")
       val angle = scala.io.StdIn.readInt()
-      servo0.set(angle)
+      //servo0.set(angle)
       servo1.set(angle)
     }
   }
@@ -209,7 +209,7 @@ object RPiMain
   def testGPIO:Unit=
   {
     import psksvp.RPi.GPIO
-    val outPin = GPIO.pinForOutput(0)
-
+    val outPin = GPIO.getOutputPin(0)
+    outPin.digitalWrite(GPIO.HIGH())
   }
 }

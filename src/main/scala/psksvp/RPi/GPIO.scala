@@ -123,8 +123,8 @@ object GPIO
   class GPIOClockOutputPin extends OutputPin(7, GPIOClock())
 
 
-  def pinForOutput(pin:Int)= new OutputPin(pin)
-  def pinForInput(pin:Int)= new InputPin(pin)
-  def pinForPWMOutput= new PWMOutputPin
-  def pinForGPIOClockOutput= new GPIOClockOutputPin
+  def getOutputPin(pin:Int)= new OutputPin(pin)
+  def getInputPin(pin:Int)= new InputPin(pin)
+  def getPWMOutputPin= new PWMOutputPin
+  def getGPIOClockOutputPin= new GPIOClockOutputPin
 }

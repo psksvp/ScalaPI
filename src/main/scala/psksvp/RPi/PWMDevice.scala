@@ -71,12 +71,10 @@ abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) e
   }
 }
 
-abstract class MotorPWMDevice extends PWMDevice
-
 case class Servo(armAngleRange:Range) extends RangePWMDevice(armAngleRange)
 case class ESC() extends RangePWMDevice(-128 to 128)
 
-
+abstract class MotorPWMDevice extends PWMDevice
 
 abstract class MotorCommand
 case class Forward() extends MotorCommand
@@ -190,36 +188,63 @@ case class StepperMotor(steps:Int=200,
 
   def oneStep(dir:MotorCommand, style:SteppingCommand):Unit=
   {
+    var pwmA = 255
+    var pwmB = 255
+
     def singleStep(dir:MotorCommand):Unit=
     {
+      val iDir = if(dir == Forward()) 1 else -1
       if((currentStep / (microSteps / 2)) % 2 != 0)
-      {
-
-      }
+        currentStep = currentStep + (microSteps / 2) * iDir
       else
-      {
-
-      }
+        currentStep = currentStep + microSteps * iDir
     }
 
     def doubleStep(dir:MotorCommand):Unit=
     {
-
+      val iDir = if(dir == Forward()) 1 else -1
+      if((currentStep / (microSteps / 2)) % 2 == 0)
+        currentStep = currentStep + (microSteps / 2) * iDir
+      else
+        currentStep = currentStep + microSteps * iDir
     }
 
     def interleaveStep(dir:MotorCommand):Unit=
     {
-
+      val iDir = if(dir == Forward()) 1 else -1
+      currentStep = currentStep + (microSteps / 2) * iDir
     }
 
     def microStep(dir:MotorCommand):Unit=
     {
-
+      val iDir = if(dir == Forward()) 1 else -1
+      currentStep = currentStep + iDir
+      currentStep = currentStep + microSteps * 4
+      currentStep = currentStep % microSteps * 4
+      pwmA = 0
+      pwmB = 0
+      if(currentStep >= 0 && currentStep < microSteps)
+      {
+        pwmA = microStepCurve(microSteps - currentStep)
+        pwmB = microStepCurve(currentStep)
+      }
+      else if(currentStep >= microSteps && currentStep < microSteps*2)
+      {
+        pwmA = microStepCurve(currentStep - microSteps)
+        pwmB = microStepCurve(microSteps*2 - currentStep)
+      }
+      else if(currentStep >= microSteps*2 && currentStep < microSteps*3)
+      {
+        pwmA = microStepCurve(microSteps * 3 - currentStep)
+        pwmB = microStepCurve(currentStep - microSteps * 2)
+      }
+      else if(currentStep >= microSteps*3 && currentStep < microSteps*4)
+      {
+        pwmA = microStepCurve(currentStep - microSteps * 3)
+        pwmB = microStepCurve(microSteps * 4 - currentStep)
+      }
     }
 
-
-    val pwmA = 255
-    val pwmB = 255
     style match
     {
       case SingleStep() => singleStep(dir)
@@ -228,7 +253,16 @@ case class StepperMotor(steps:Int=200,
       case MicroStep() => microStep(dir)
     }
 
+    currentStep = currentStep + microSteps * 4
+    currentStep = currentStep % microSteps * 4
 
+    pwmController match
+    {
+      case Some(pwm) =>
+
+
+      case None      => println(this + " this DCMotor has not been attached to any PWMController")
+    }
   }
 }
 

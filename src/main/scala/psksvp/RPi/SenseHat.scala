@@ -119,7 +119,7 @@ object SenseHAT
       update
     }
 
-    def setPixel(x:Int, y:Int, color:(Int, Int, Int)): Unit =
+    def setPixel(x:Int, y:Int, color:(Int, Int, Int), redraw:Boolean=false): Unit =
     {
       def packRGB(red:Int, green:Int, blue:Int):Array[Byte]=
       {
@@ -137,6 +137,7 @@ object SenseHAT
       val pix = packRGB(color._1, color._2, color._3)
       pixBuf(offset) = pix(0)
       pixBuf(offset + 1) = pix(1)
+      if(redraw) update
     }
 
     def getPixel(x:Int, y:Int):(Int, Int, Int)=
@@ -162,10 +163,10 @@ object SenseHAT
     {
       import java.lang.Long
       val bin = ("0" * Long.numberOfLeadingZeros(bits)) + bits.toBinaryString
-      drawBitmap(bin, color)
+      drawBitmap(bin, color, (0, 0), true)
     }
 
-    def drawBitmap(bits:String, color:(Int, Int, Int), offset:(Int, Int)=(0,0)):Unit=
+    def drawBitmap(bits:String, color:(Int, Int, Int), offset:(Int, Int)=(0,0), redraw:Boolean=false):Unit=
     {
       require(64 == bits.length)
       val index = 0 to 7
@@ -181,6 +182,7 @@ object SenseHAT
         }
         i = i + 1
       }
+      if(redraw) update
     }
 
     def drawChar(c:Char, color:(Int, Int, Int), slide:Int=0):Unit=
