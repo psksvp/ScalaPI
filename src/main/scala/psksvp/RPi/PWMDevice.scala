@@ -186,7 +186,7 @@ case class StepperMotor(steps:Int=200,
     steppingCounter = 0
   }
 
-  def oneStep(dir:MotorCommand, style:SteppingCommand):Unit=
+  def oneStep(dir:MotorCommand, style:SteppingCommand):Int=
   {
     var pwmA = 255
     var pwmB = 255
@@ -245,23 +245,86 @@ case class StepperMotor(steps:Int=200,
       }
     }
 
+    def coilsControlArray:Array[Int]=
+    {
+      if(style == MicroStep())
+      {
+        if (currentStep >= 0 && currentStep < microSteps)
+          Array(1, 1, 0, 0)
+        else if (currentStep >= microSteps && currentStep < microSteps * 2)
+          Array(0, 1, 1, 0)
+        else if (currentStep >= microSteps * 2 && currentStep < microSteps * 3)
+          Array(0, 0, 1, 1)
+        else if (currentStep >= microSteps * 3 && currentStep < microSteps * 4)
+          Array(1, 0, 0, 1)
+        else
+          sys.error("fatal error StepperMotor::oneStep::coilsControlArray code should not reach here")
+      }
+      else
+      {
+        val coils = Array(Array(1, 0, 0, 0),
+                          Array(1, 1, 0, 0),
+                          Array(0, 1, 0, 0),
+                          Array(0, 1, 1, 0),
+                          Array(0, 0, 1, 0),
+                          Array(0, 0, 1, 1),
+                          Array(0, 0, 0, 1),
+                          Array(1, 0, 0, 1))
+        coils(currentStep/(microSteps/2))
+      }
+    }
+
     style match
     {
-      case SingleStep() => singleStep(dir)
-      case DoubleStep() => doubleStep(dir)
+      case SingleStep()     => singleStep(dir)
+      case DoubleStep()     => doubleStep(dir)
       case InterleaveStep() => interleaveStep(dir)
-      case MicroStep() => microStep(dir)
+      case MicroStep()      => microStep(dir)
     }
 
     currentStep = currentStep + microSteps * 4
     currentStep = currentStep % microSteps * 4
-
     pwmController match
     {
-      case Some(pwm) =>
+      case Some(pwm) => pwm.send(PWMA, 0, pwmA * 16)
+                        pwm.send(PWMB, 0, pwmB * 16)
+                        val coils = coilsControlArray
+                        pwm.setPin(AIN2, coils(0))
+                        pwm.setPin(BIN1, coils(1))
+                        pwm.setPin(AIN1, coils(2))
+                        pwm.setPin(BIN2, coils(3))
+                        currentStep
+      case None      => sys.error(this + " this StepperMotor has not been attached to any PWMController")
+    }
+  } // oneStep
 
+  def step(steps:Int, dir:MotorCommand, stepStyle:SteppingCommand):Unit=
+  {
+    var latestStep = 0
+    var delay = secPerStep
+    var nsteps = steps
+    if(stepStyle == InterleaveStep())
+      delay = delay / 2.0
+    else if(stepStyle == MicroStep())
+    {
+      delay = delay / microSteps
+      nsteps = nsteps * microSteps
+    }
 
-      case None      => println(this + " this DCMotor has not been attached to any PWMController")
+    import psksvp.Loop.loop
+    loop(nsteps)
+    {
+      latestStep = oneStep(dir, stepStyle)
+      Thread.sleep((delay * 1000).toInt)
+    }
+
+    if(stepStyle == MicroStep())
+    {
+      while(0 != latestStep && latestStep != microSteps)
+      {
+        latestStep = oneStep(dir, stepStyle)
+        Thread.sleep((delay * 1000).toInt)
+      }
     }
   }
 }
