@@ -310,8 +310,7 @@ case class StepperMotor(steps:Int=200,
       delay = delay / microSteps
       nsteps = nsteps * microSteps
     }
-
-    import psksvp.Loop.loop
+    
     for(i <- 1 to nsteps)
     {
       latestStep = oneStep(dir, stepStyle)
