@@ -312,7 +312,7 @@ case class StepperMotor(steps:Int=200,
     }
 
     import psksvp.Loop.loop
-    loop(nsteps)
+    for(i <- 1 to nsteps)
     {
       latestStep = oneStep(dir, stepStyle)
       Thread.sleep((delay * 1000).toInt)
