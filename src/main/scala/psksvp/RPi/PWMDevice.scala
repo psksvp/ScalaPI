@@ -251,16 +251,13 @@ case class StepperMotor(steps:Int=200,
     {
       if(style == MicroStep())
       {
-        if (currentStep >= 0 && currentStep < microSteps)
-          Array(1, 1, 0, 0)
-        else if (currentStep >= microSteps && currentStep < microSteps * 2)
-          Array(0, 1, 1, 0)
-        else if (currentStep >= microSteps * 2 && currentStep < microSteps * 3)
-          Array(0, 0, 1, 1)
-        else if (currentStep >= microSteps * 3 && currentStep < microSteps * 4)
-          Array(1, 0, 0, 1)
-        else
-          sys.error("fatal error StepperMotor::oneStep::coilsControlArray code should not reach here")
+        currentStep match
+        {
+          case c if (0 until microSteps).contains(c)              => Array(1, 1, 0, 0)
+          case c if (microSteps until 2*microSteps).contains(c)   => Array(0, 1, 1, 0)
+          case c if (2*microSteps until 3*microSteps).contains(c) => Array(0, 0, 1, 1)
+          case c if (3*microSteps until 4*microSteps).contains(c) => Array(1, 0, 0, 1)
+        }
       }
       else
       {
@@ -276,6 +273,7 @@ case class StepperMotor(steps:Int=200,
       }
     }
 
+    ///////////////////////////////////////
     style match
     {
       case SingleStep()     => singleStep(dir)

@@ -219,13 +219,24 @@ object RPiMain
     val motorHAT = new MotorHAT
     val dc1 = new DCMotor
     motorHAT.attachDevice(dc1, 1)
-    dc1.setSpeed(50)
-    println("forward")
-    dc1.forward
-    Thread.sleep(2000)
-    println("reverse")
-    dc1.backward
-    Thread.sleep(2000)
+    var speed = 10
+    while(0 != speed)
+    {
+      print("enter speed:")
+      speed = scala.io.StdIn.readInt()
+      dc1.setSpeed(Math.abs(speed))
+      if(speed > 0)
+      {
+        println("forward at speed " + speed)
+        dc1.forward
+      }
+      else if(speed < 0)
+      {
+        println("backward at speed " + speed)
+        dc1.backward
+      }
+    }
+    println("release the motor")
     dc1.release
   }
 
