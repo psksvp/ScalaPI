@@ -88,6 +88,9 @@ case class DoubleStep() extends SteppingCommand
 case class InterleaveStep() extends SteppingCommand
 case class MicroStep() extends SteppingCommand
 
+/**
+  *
+  */
 case class DCMotor() extends MotorPWMDevice
 {
   private val speedLimit = psksvp.Math.Limit[Int](0, 255)
@@ -102,24 +105,25 @@ case class DCMotor() extends MotorPWMDevice
     ch match
     {
       case 0 => pwmPin = 8
-                in1Pin = 9
-                in2Pin = 10
+                in2Pin = 9
+                in1Pin = 10
       case 1 => pwmPin = 13
-                in1Pin = 12
-                in2Pin = 11
+                in2Pin = 12
+                in1Pin = 11
       case 2 => pwmPin = 2
-                in1Pin = 3
-                in2Pin = 4
+                in2Pin = 3
+                in1Pin = 4
       case 3 => pwmPin = 7
-                in1Pin = 6
-                in2Pin = 5
-      case _ =>
+                in2Pin = 6
+                in1Pin = 5
+      case _ => sys.error("code should never reach here. DCMotor.init")
     }
+    println("DCMotor.init has been called, " + pwmPin + " " + in2Pin + " " + in1Pin)
   }
 
-  def forward()=run(Forward())
-  def backward()=run(Backward())
-  def release()=run(Release())
+  def forward=run(Forward())
+  def backward=run(Backward())
+  def release=run(Release())
 
   def run(command:MotorCommand):Unit=
   {
@@ -149,10 +153,17 @@ case class DCMotor() extends MotorPWMDevice
   }
 }
 
+/**
+  *
+  * @param steps
+  * @param microSteps
+  * @param microStepCurve
+  */
 case class StepperMotor(steps:Int=200,
                         microSteps:Int=8,
                         microStepCurve:Array[Int]=Array(0, 50, 98, 142, 180, 212, 236, 250, 255)) extends MotorPWMDevice
 {
+
   private val revSteps = steps
   private var secPerStep = 0.1
   private var steppingCounter = 0
@@ -223,25 +234,16 @@ case class StepperMotor(steps:Int=200,
       currentStep = currentStep % microSteps * 4
       pwmA = 0
       pwmB = 0
-      if(currentStep >= 0 && currentStep < microSteps)
+      currentStep match
       {
-        pwmA = microStepCurve(microSteps - currentStep)
-        pwmB = microStepCurve(currentStep)
-      }
-      else if(currentStep >= microSteps && currentStep < microSteps*2)
-      {
-        pwmA = microStepCurve(currentStep - microSteps)
-        pwmB = microStepCurve(microSteps*2 - currentStep)
-      }
-      else if(currentStep >= microSteps*2 && currentStep < microSteps*3)
-      {
-        pwmA = microStepCurve(microSteps * 3 - currentStep)
-        pwmB = microStepCurve(currentStep - microSteps * 2)
-      }
-      else if(currentStep >= microSteps*3 && currentStep < microSteps*4)
-      {
-        pwmA = microStepCurve(currentStep - microSteps * 3)
-        pwmB = microStepCurve(microSteps * 4 - currentStep)
+        case c if (0 until microSteps).contains(c)              => pwmA = microStepCurve(microSteps - c)
+                                                                   pwmB = microStepCurve(c)
+        case c if (microSteps until 2*microSteps).contains(c)   => pwmA = microStepCurve(c - microSteps)
+                                                                   pwmB = microStepCurve(microSteps*2 - c)
+        case c if (2*microSteps until 3*microSteps).contains(c) => pwmA = microStepCurve(microSteps*3 - c)
+                                                                   pwmB = microStepCurve(c - microSteps*2)
+        case c if (3*microSteps until 4*microSteps).contains(c) => pwmA = microStepCurve(c - microSteps*3)
+                                                                   pwmB = microStepCurve(microSteps*4 - c)
       }
     }
 
