@@ -20,6 +20,8 @@ After cloning this repos, run make all from command line. A prebuilt jar (ScalaP
 > cd ScalaPi
 > make all
 ```
+If all goes well, it will create ScalaPi.jar with all the native libs packed in there. The example below shows how ScalaPi.jar can be used in REPL for a quick test.
+
 
 ## REPL example
 ```
@@ -28,8 +30,8 @@ Welcome to Scala version 2.11.7 (Java HotSpot(TM) Client VM, Java 1.8.0).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
-scala> import psksvp.RPi.SenseHAT
-import psksvp.RPi.SenseHAT
+scala> import psksvp.RPi._
+import psksvp.RPi._
 
 scala> val display = SenseHAT.display
 display: psksvp.RPi.SenseHAT.LEDDisplay = psksvp.RPi.SenseHAT$LEDDisplay@1615099
@@ -39,6 +41,47 @@ for(a <- List(0, 90, 180, 270)){
      |   display.setRotation(a)
      |   Thread.sleep(1000)
      | }
+
+scala> PWMDevice.using
+register device -> psksvp.RPi.Servo
+register device -> psksvp.RPi.ESC
+register device -> psksvp.RPi.DCMotor
+register device -> psksvp.RPi.StepperMotor
+
+scala> val motorHAT = new MotorHAT
+motorHAT: psksvp.RPi.MotorHAT = psksvp.RPi.MotorHAT@6de728
+
+scala> val dc0 = motorHAT.attachDevice[DCMotor](channel=1)
+DCMotor.init has been called, 13 12 11
+dc0: psksvp.RPi.DCMotor = DCMotor()
+
+scala> dc0.setSpeed(30)
+
+scala> dc0.forward
+
+scala> dc0.setSpeed(50)
+
+scala> dc0.setSpeed(20)
+
+scala> dc0.backward
+
+scala> dc0.release
+
+scala> val pwmHAT = new PWMHAT
+pwmHAT: psksvp.RPi.PWMHAT = psksvp.RPi.PWMHAT@3fc542
+
+scala> val servo0 = pwmHAT.attachDevice[Servo](channel=0)
+
+scala> dc0.forward
+
+scala> servo0.set(90)
+
+scala> servo0.set(45)
+
+scala> dc0.release
+
+scala> servo0.set(20)
+
 ```
 
 ## Sample code
