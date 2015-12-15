@@ -31,6 +31,8 @@ The BSD 3-Clause License
 
 package psksvp.Main
 
+import psksvp.RPi.PWMDevice
+
 /**
   * Created by psksvp on 30/11/2015.
   */
@@ -192,11 +194,10 @@ object RPiMain
   {
     println("TestServo PWM")
     import psksvp.RPi.{Servo, PWMHAT}
-    val servo1 = Servo(armAngleRange = (0 to 180))
-    val servo0 = Servo(armAngleRange = (0 to 180))
+    PWMDevice.using
     val pwmHat = new PWMHAT
-    pwmHat.attachDevice(servo1, channel=0)
-    pwmHat.attachDevice(servo0, channel=15)
+    val servo0 = pwmHat.attachDevice[Servo](channel=0)
+    val servo1 = pwmHat.attachDevice[Servo](channel=15)
 
     while(true)
     {
@@ -216,9 +217,10 @@ object RPiMain
   {
     println("test Motor HAT")
     import psksvp.RPi._
+    PWMDevice.using
+
     val motorHAT = new MotorHAT
-    val dc1 = new DCMotor
-    motorHAT.attachDevice(dc1, 1)
+    val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
     var speed = 10
     while(0 != speed)
     {

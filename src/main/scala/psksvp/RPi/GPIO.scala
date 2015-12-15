@@ -35,7 +35,6 @@ package psksvp.RPi
   */
 object GPIO
 {
-  import psksvp.FileSystem.SimpleFileIO
   import psksvp.jni.rpi.{PiGPIO, PiGPIOConstants}
 
   private var init=false
@@ -121,7 +120,6 @@ object GPIO
   }
 
   class GPIOClockOutputPin extends OutputPin(7, GPIOClock())
-
 
   def getOutputPin(pin:Int)= new OutputPin(pin)
   def getInputPin(pin:Int)= new InputPin(pin)

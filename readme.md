@@ -39,23 +39,6 @@ for(a <- List(0, 90, 180, 270)){
      |   display.setRotation(a)
      |   Thread.sleep(1000)
      | }
-scala> import psksvp.RPi.{Servo, PWMHAT}
-import psksvp.RPi.{Servo, PWMHAT}
-
-scala> val pwmHat = new PWMHAT
-pwmHat: psksvp.RPi.PWMHAT = psksvp.RPi.PWMHAT@9d82f9
-
-scala> val servo0 = Servo(armAngleRange = (0 to 180))
-
-scala> pwmHat.attachDevice(servo0, channel=0)
-
-scala> servo0.set(90)
-
-scala> servo0.set(180)
-
-scala> servo0.set(0)
-
-scala> servo0.set(45)
 ```
 
 ## Sample code
@@ -64,16 +47,20 @@ There is no documentation yet, please look at the example code below.
 
 
 ```
+/**
+  * Created by psksvp on 30/11/2015.
+  */
 object RPiMain
 {
   def main(args:Array[String]):Unit=
   {
-    testSenseHatStick
-    testSenseHatDisplayRotate
-    testSenseHatDisplayRandomColors
-    testSenseHatSensors
-    testSenseHatDisplyChar
-    testPWMHatServo
+    //testSenseHatStick
+    //testSenseHatDisplayRotate
+    //testSenseHatDisplayRandomColors
+    //testSenseHatSensors
+    //testPWMHatServo
+    testMotorHAT
+    //testSenseHatDisplyChar
   }
 
   def testSenseHatDisplyChar:Unit=
@@ -93,7 +80,7 @@ object RPiMain
       display.clear
       display.drawBitmap(AsciiBitmap(i), (r,g,b))
       display.update
-      Thread.sleep(1000)
+      Thread.sleep(150)
     }
   }
 
@@ -163,19 +150,19 @@ object RPiMain
                            println("pressure     -> " + data.environment.pressure)
                            println("height       -> " + data.environment.height)
                            println("temperature  -> " + data.environment.temperature)
-                           
+
                            println("pos roll     -> " + data.pose.roll)
                            println("pos pitch    -> " + data.pose.pitch)
                            println("pos yaw      -> " + data.pose.yaw)
-                           
+
                            println("gyro roll    -> " + data.gyro.roll)
                            println("gyro pitch   -> " + data.gyro.pitch)
                            println("gyro yaw     -> " + data.gyro.yaw)
-                           
+
                            println("accel roll   -> " + data.accelerometer.roll)
                            println("accel pitch  -> " + data.accelerometer.pitch)
                            println("accel yaw    -> " + data.accelerometer.yaw)
-                           
+
                            println("compass roll -> " + data.compass.roll)
                            println("compass pitch-> " + data.compass.pitch)
                            println("compass yaw  -> " + data.compass.yaw)
@@ -221,21 +208,62 @@ object RPiMain
   {
     println("TestServo PWM")
     import psksvp.RPi.{Servo, PWMHAT}
-    val servo1 = Servo(armAngleRange = (0 to 180))
-    val servo0 = Servo(armAngleRange = (0 to 180))
+    PWMDevice.using
     val pwmHat = new PWMHAT
-    pwmHat.attachDevice(servo1, channel=0)
-    pwmHat.attachDevice(servo0, channel=3)
+    val servo0 = pwmHat.attachDevice[Servo](channel=0)
+    val servo1 = pwmHat.attachDevice[Servo](channel=15)
 
     while(true)
     {
       print("enter an angle:")
       val angle = scala.io.StdIn.readInt()
-      servo0.set(angle)
-      servo1.set(angle)
+      if(angle < 0)
+        return
+      else
+      {
+        servo0.set(angle)
+        servo1.set(angle)
+      }
     }
   }
+
+  def testMotorHAT:Unit=
+  {
+    println("test Motor HAT")
+    import psksvp.RPi._
+    PWMDevice.using
+
+    val motorHAT = new MotorHAT
+    val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
+    var speed = 10
+    while(0 != speed)
+    {
+      print("enter speed:")
+      speed = scala.io.StdIn.readInt()
+      dc1.setSpeed(Math.abs(speed))
+      if(speed > 0)
+      {
+        println("forward at speed " + speed)
+        dc1.forward
+      }
+      else if(speed < 0)
+      {
+        println("backward at speed " + speed)
+        dc1.backward
+      }
+    }
+    println("release the motor")
+    dc1.release
+  }
+
+  def testGPIO:Unit=
+  {
+    import psksvp.RPi.GPIO
+    val outPin = GPIO.getOutputPin(0)
+    outPin.digitalWrite(GPIO.HIGH())
+  }
 }
+
 ```
 ## License
  The BSD 3-Clause License

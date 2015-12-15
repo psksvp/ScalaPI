@@ -35,21 +35,28 @@ package psksvp.RPi
   */
 abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int)
 {
+  import scala.reflect.ClassTag
   private val ports = Array.ofDim[Option[T]](16)
   for(i <- ports.indices)
     ports(i) = None
 
   def pwmController:PWMController
 
-  def attachDevice(device:T, channel:Int):Unit =
+  def attachDevice[D:ClassTag](channel:Int):D =
   {
     require(channel >= 0 && channel < numberOfChannels)
     ports(channel) match
     {
-      case None         => ports(channel) = Some(device)
-                          device.init(Some(pwmController), channel)
+      case None => PWMDevice.createDevice[D] match
+                   {
+                      case Some(device) => ports(channel) = Some(device.asInstanceOf[T])
+                                           device.asInstanceOf[T].init(Some(pwmController), channel)
+                                           device
+                      case None         => sys.error("AdaFruitPWMI2CBoard::attachDevice fail because class D is not registered ")
+                   }
 
-      case _            => sys.error("PWMHat.attachDevice channel " + " is not available")
+
+      case _    => sys.error("PWMHat.attachDevice channel " + channel + " is not available")
     }
   }
 
@@ -58,7 +65,7 @@ abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int
     getChannelOfDevice(device) match
     {
       case Some(channel) => ports(channel).get.init(None, -1)
-        ports(channel) = None
+                            ports(channel) = None
       case _             =>
     }
   }

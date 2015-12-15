@@ -31,12 +31,16 @@ The BSD 3-Clause License
 package psksvp.RPi
 
 import scala.collection.immutable.Range
+
+
 /**
   * Created by psksvp on 2/12/2015.
   */
 
-
-abstract class PWMDevice
+/**
+  *
+  */
+abstract class PWMDevice extends
 {
   private var pwm:Option[PWMController] = None
   private var channel = -1
@@ -49,7 +53,46 @@ abstract class PWMDevice
 
   def pwmController=pwm
   def pwmChannel=channel
+  def createSelf:PWMDevice
 }
+
+/**
+  * a bit of factory pattern to make client code
+  * easier to code
+  */
+object PWMDevice
+{
+  import scala.reflect.ClassTag
+
+  private val register = scala.collection.mutable.Set[PWMDevice]()
+  def registerDevice(device:PWMDevice):Unit=
+  {
+    register += device
+    println("register device -> " + device.getClass.getName)
+  }
+
+  def createDevice[T:ClassTag]:Option[T]=
+  {
+    for(device <- register)
+    {
+      device match
+      {
+        case d:T => return Some(device.asInstanceOf[T])
+        case _   =>
+      }
+    }
+    None
+  }
+
+  def using:Unit=
+  {
+    PWMDevice.registerDevice(Servo())
+    PWMDevice.registerDevice(ESC())
+    PWMDevice.registerDevice(DCMotor())
+    PWMDevice.registerDevice(StepperMotor())
+  }
+}
+
 /**
   *
   * @param rawRange
@@ -71,10 +114,23 @@ abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) e
   }
 }
 
-case class Servo(armAngleRange:Range) extends RangePWMDevice(armAngleRange)
-case class ESC() extends RangePWMDevice(-128 to 128)
+/**
+  *
+  * @param armAngleRange
+  */
+case class Servo(armAngleRange:Range=0 to 180) extends RangePWMDevice(armAngleRange)
+{
+  def createSelf:PWMDevice = Servo()
+}
 
-abstract class MotorPWMDevice extends PWMDevice
+/**
+  *
+  */
+case class ESC() extends RangePWMDevice(-128 to 128)
+{
+  def createSelf:PWMDevice = ESC()
+}
+
 
 abstract class MotorCommand
 case class Forward() extends MotorCommand
@@ -88,6 +144,11 @@ case class DoubleStep() extends SteppingCommand
 case class InterleaveStep() extends SteppingCommand
 case class MicroStep() extends SteppingCommand
 
+
+/**
+  *
+  */
+abstract class MotorPWMDevice extends PWMDevice
 /**
   *
   */
@@ -97,6 +158,8 @@ case class DCMotor() extends MotorPWMDevice
   private var pwmPin = 0
   private var in1Pin = 0
   private var in2Pin = 0
+
+  def createSelf:PWMDevice = DCMotor()
 
   override def init(h:Option[PWMController], ch:Int):Unit=
   {
@@ -175,6 +238,8 @@ case class StepperMotor(steps:Int=200,
   private var PWMB = 13
   private var BIN2 = 12
   private var BIN1 = 11
+
+  def createSelf:PWMDevice = StepperMotor()
 
   override def init(h:Option[PWMController], ch:Int):Unit=
   {
@@ -310,7 +375,7 @@ case class StepperMotor(steps:Int=200,
       delay = delay / microSteps
       nsteps = nsteps * microSteps
     }
-    
+
     for(i <- 1 to nsteps)
     {
       latestStep = oneStep(dir, stepStyle)
