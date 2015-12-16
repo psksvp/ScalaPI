@@ -87,9 +87,7 @@ scala> servo0.set(20)
 ## Sample code
 There is no documentation yet, please look at the example code below. 
 
-
-
-```
+~~~scala
 /**
   * Created by psksvp on 30/11/2015.
   */
@@ -307,7 +305,7 @@ object RPiMain
   }
 }
 
-```
+~~~
 ## License
  The BSD 3-Clause License
  Copyright (c) 2015, Pongsak Suvanpong (psksvp@gmail.com)
