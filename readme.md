@@ -1,8 +1,10 @@
 # ScalaPI: Interfacing Rasberry PI hardware with Scala#
 
 Scala classes to control the 
+
 * GPIO
 * i2c
+* PiCamera (CSL interface)
 * SenseHAT  https://www.raspberrypi.org/products/sense-hat/
 * Adafruit PWM HAT https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
 * Adafruit Stepper/DC Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
@@ -16,10 +18,12 @@ Scala classes to control the
 
 ## Build
 After cloning this repos, run make all from command line. A prebuilt jar (ScalaPi.jar) is also provided in the repos.
+
 ```
 > cd ScalaPi
 > make all
 ```
+
 If all goes well, it will create ScalaPi.jar with all the native libs packed in there. The example below shows how ScalaPi.jar can be used in REPL for a quick test.
 
 
@@ -335,6 +339,9 @@ object RPiMain
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+## Note
+I am a dreamer. I believe that all human are intelligence enough.
  
 ## Acknowledgement
 * Use code from https://github.com/adamheinrich/native-utils for loading shared lib from jar.

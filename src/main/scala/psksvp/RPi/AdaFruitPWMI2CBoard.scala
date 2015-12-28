@@ -51,8 +51,9 @@ abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int
                    {
                       case Some(device) => ports(channel) = Some(device.asInstanceOf[T])
                                            device.asInstanceOf[T].init(Some(pwmController), channel)
+                                           println("attach " + device + " at channel " + channel)
                                            device
-                      case None         => sys.error("AdaFruitPWMI2CBoard::attachDevice fail because class D is not registered ")
+                      case None         => sys.error("AdaFruitPWMI2CBoard::attachDevice fail. May need to call PWMDevice.using")
                    }
 
 

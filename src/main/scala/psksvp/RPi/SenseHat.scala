@@ -36,6 +36,7 @@ package psksvp.RPi
   *
   * this class interfaces with Sense Hat
   * https://www.raspberrypi.org/products/sense-hat/
+  * The code is written by looking at https://github.com/RPi-Distro/python-sense-hat
   *
   * There can be only one SenseHat attached with Raspberry Pi
   * thus, SenseHat is Object
@@ -300,6 +301,14 @@ object SenseHAT
       def accelerometer = Orientation(data.getAccel.getRoll, data.getAccel.getPitch, data.getAccel.getYaw)
       def pose = Orientation(data.getPose.getRoll, data.getPose.getPitch, data.getPose.getYaw)
       def compass = Orientation(data.getCompass.getRoll, data.getCompass.getPitch, data.getCompass.getYaw)
+      def heading:Double=
+      {
+        val heading = (Math.atan2(data.getCompass.getPitch, data.getCompass.getRoll) * 180.0) / Math.PI
+        if (heading < 0.0)
+          heading + 360.0
+        else
+          heading
+      }
     }
 
     def init:Boolean=

@@ -77,7 +77,7 @@ object PWMDevice
     {
       device match
       {
-        case d:T => return Some(device.asInstanceOf[T])
+        case d:T => return Some(d.createSelf.asInstanceOf[T])
         case _   =>
       }
     }
@@ -86,10 +86,10 @@ object PWMDevice
 
   def using:Unit=
   {
-    PWMDevice.registerDevice(Servo())
-    PWMDevice.registerDevice(ESC())
-    PWMDevice.registerDevice(DCMotor())
-    PWMDevice.registerDevice(StepperMotor())
+    PWMDevice.registerDevice(new Servo)
+    PWMDevice.registerDevice(new ESC)
+    PWMDevice.registerDevice(new DCMotor)
+    PWMDevice.registerDevice(new StepperMotor)
   }
 }
 
@@ -118,17 +118,17 @@ abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) e
   *
   * @param armAngleRange
   */
-case class Servo(armAngleRange:Range=0 to 180) extends RangePWMDevice(armAngleRange)
+class Servo(armAngleRange:Range=0 to 180) extends RangePWMDevice(armAngleRange)
 {
-  def createSelf:PWMDevice = Servo()
+  def createSelf:PWMDevice = new Servo
 }
 
 /**
   *
   */
-case class ESC() extends RangePWMDevice(-128 to 128)
+class ESC() extends RangePWMDevice(-128 to 128)
 {
-  def createSelf:PWMDevice = ESC()
+  def createSelf:PWMDevice = new ESC
 }
 
 
@@ -152,14 +152,14 @@ abstract class MotorPWMDevice extends PWMDevice
 /**
   *
   */
-case class DCMotor() extends MotorPWMDevice
+class DCMotor extends MotorPWMDevice
 {
   private val speedLimit = psksvp.Math.Limit[Int](0, 255)
   private var pwmPin = 0
   private var in1Pin = 0
   private var in2Pin = 0
 
-  def createSelf:PWMDevice = DCMotor()
+  def createSelf:PWMDevice = new DCMotor
 
   override def init(h:Option[PWMController], ch:Int):Unit=
   {
@@ -187,6 +187,7 @@ case class DCMotor() extends MotorPWMDevice
   def forward=run(Forward())
   def backward=run(Backward())
   def release=run(Release())
+  def stop=run(Release())
 
   def run(command:MotorCommand):Unit=
   {
@@ -222,9 +223,9 @@ case class DCMotor() extends MotorPWMDevice
   * @param microSteps
   * @param microStepCurve
   */
-case class StepperMotor(steps:Int=200,
-                        microSteps:Int=8,
-                        microStepCurve:Array[Int]=Array(0, 50, 98, 142, 180, 212, 236, 250, 255)) extends MotorPWMDevice
+class StepperMotor(steps:Int=200,
+                   microSteps:Int=8,
+                   microStepCurve:Array[Int]=Array(0, 50, 98, 142, 180, 212, 236, 250, 255)) extends MotorPWMDevice
 {
 
   private val revSteps = steps
@@ -239,7 +240,7 @@ case class StepperMotor(steps:Int=200,
   private var BIN2 = 12
   private var BIN1 = 11
 
-  def createSelf:PWMDevice = StepperMotor()
+  def createSelf:PWMDevice = new StepperMotor
 
   override def init(h:Option[PWMController], ch:Int):Unit=
   {

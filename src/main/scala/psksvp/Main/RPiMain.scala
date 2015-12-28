@@ -47,6 +47,10 @@ object RPiMain
     //testPWMHatServo
     testMotorHAT
     //testSenseHatDisplyChar
+
+    //psksvp.RPi.Sample.runLife(100)
+
+    //testSenseHatHeading
   }
 
   def testSenseHatDisplyChar:Unit=
@@ -123,40 +127,66 @@ object RPiMain
     display.clear
   }
 
+  def testSenseHatHeading:Unit=
+  {
+    import psksvp.RPi.SenseHAT
+    import psksvp.Terminal.ANSI
+    val sensors = SenseHAT.sensors
+    val nSample = 50
+    while(true)
+    {
+      var sum = 0.0
+      for(i <- 1 to nSample)
+      {
+        sensors.poll match
+        {
+          case Some(data) => sum = sum + data.heading
+          case None       =>
+        }
+        Thread.sleep(10)
+      }
+      println("heading ->" + (sum / nSample) + " -> " + Math.round(sum / nSample))
+    }
+  }
+
   def testSenseHatSensors:Unit=
   {
     import psksvp.RPi.SenseHAT
+    import psksvp.Terminal.ANSI
     val sensors = SenseHAT.sensors
     var m = 10
     while(m > 0)
     {
+      println(ANSI.clearScreen)
+      println(ANSI.setCursor(0, 0))
       sensors.poll match
       {
         case Some(data) => println("humidity     -> " + data.environment.humidity)
                            println("pressure     -> " + data.environment.pressure)
                            println("height       -> " + data.environment.height)
                            println("temperature  -> " + data.environment.temperature)
-
+                           println("====================================================")
                            println("pos roll     -> " + data.pose.roll)
                            println("pos pitch    -> " + data.pose.pitch)
                            println("pos yaw      -> " + data.pose.yaw)
-
+                           println("====================================================")
                            println("gyro roll    -> " + data.gyro.roll)
                            println("gyro pitch   -> " + data.gyro.pitch)
                            println("gyro yaw     -> " + data.gyro.yaw)
-
+                           println("====================================================")
                            println("accel roll   -> " + data.accelerometer.roll)
                            println("accel pitch  -> " + data.accelerometer.pitch)
                            println("accel yaw    -> " + data.accelerometer.yaw)
-
+                           println("====================================================")
                            println("compass roll -> " + data.compass.roll)
                            println("compass pitch-> " + data.compass.pitch)
                            println("compass yaw  -> " + data.compass.yaw)
                            println("====================================================")
+                           println("compass heading => " + data.heading)
         case None       => println("sensors poll fail")
       }
       Thread.sleep(1000)
-      m = m - 1
+      //m = m - 1
     }
 
     sensors.deinit
@@ -221,25 +251,30 @@ object RPiMain
 
     val motorHAT = new MotorHAT
     val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
+    val dc2 = motorHAT.attachDevice[DCMotor](channel = 0)
     var speed = 10
     while(0 != speed)
     {
       print("enter speed:")
       speed = scala.io.StdIn.readInt()
       dc1.setSpeed(Math.abs(speed))
+      dc2.setSpeed(Math.abs(speed))
       if(speed > 0)
       {
         println("forward at speed " + speed)
         dc1.forward
+        dc2.forward
       }
       else if(speed < 0)
       {
         println("backward at speed " + speed)
         dc1.backward
+        dc2.forward
       }
     }
     println("release the motor")
     dc1.release
+    dc2.release
   }
 
   def testGPIO:Unit=
@@ -249,3 +284,27 @@ object RPiMain
     outPin.digitalWrite(GPIO.HIGH())
   }
 }
+
+/*
+float[] mGravity;
+float[] mGeomagnetic;
+public void onSensorChanged(SensorEvent event) {
+    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        mGravity = event.values;
+    if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+        mGeomagnetic = event.values;
+    if (mGravity != null && mGeomagnetic != null) {
+        float R[] = new float[9];
+        float I[] = new float[9];
+        boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
+                mGeomagnetic);
+        if (success) {
+            float orientation[] = new float[3];
+            SensorManager.getOrientation(R, orientation);
+            float azimut = orientation[0];
+            int azimut = (int) Math.round(Math.toDegrees(orientation[0]));
+            bearing.setText("Bearing: "+ azimut);
+        }
+    }
+}
+ */
