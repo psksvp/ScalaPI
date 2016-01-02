@@ -4,10 +4,10 @@
 
 namespace PiCamera
 {
-  bool open();
-  bool close();
-  bool isOpened();
+  bool start(int width, int height);
+  void stop();
   
+  unsigned char* grab();
 }
 
 
