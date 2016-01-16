@@ -381,7 +381,9 @@ object SenseHAT
         time,time,inputType,keyCode,value
        */
       val devFile = new FileInputStream(devicePath)
+      println("going to read device")
       devFile.read(inputBuffer)
+      println("did read device")
       devFile.close
 
       val inputType = FromBytes.makeShort(lo=inputBuffer(9), hi=inputBuffer(8))
@@ -390,6 +392,25 @@ object SenseHAT
         keyCode
       else
         -1
+    }
+
+    def read(timeout:Long):Int=
+    {
+      import java.util.Timer
+      import psksvp.Concurrency.InterruptableTask
+      var key = -1
+      val timer = new Timer(true)
+      try
+      {
+        timer.schedule(new InterruptableTask(Thread.currentThread()), timeout)
+        read
+      }
+      catch
+      {
+        case _:InterruptedException =>
+          println("SenseHAT.stick.read timeout")
+          -1
+      }
     }
   }
 

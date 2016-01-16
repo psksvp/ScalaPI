@@ -37,6 +37,6 @@ package psksvp.RPi
 class MotorHAT(frequency:Double=1600.0,
                i2cAddress:Int=0x60) extends AdaFruitPWMI2CBoard[MotorPWMDevice](4, i2cAddress)
 {
-  private val pwm = new PWMController(frequency, i2cAddress)
+  private val pwm = new PWMI2CEndPoint(frequency, i2cAddress)
   override def pwmController=pwm
 }

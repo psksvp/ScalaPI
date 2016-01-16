@@ -42,6 +42,6 @@ package psksvp.RPi
 class PWMHAT(frequency:Double=60.0,
              i2cAddress:Int=0x40) extends AdaFruitPWMI2CBoard[RangePWMDevice](16, i2cAddress)
 {
-  private val pwm = new PWMController(frequency, i2cAddress)
+  private val pwm = new PWMI2CEndPoint(frequency, i2cAddress)
   override def pwmController=pwm
 }

@@ -43,10 +43,12 @@ object RPiMain
     //testSenseHatStick
     //testSenseHatDisplayRotate
     //testSenseHatDisplayRandomColors
-    //testSenseHatSensors
+    testSenseHatSensors
     //testPWMHatServo
-    testMotorHAT
+    //testMotorHAT2
     //testSenseHatDisplyChar
+
+    //testESC
 
     //psksvp.RPi.Sample.runLife(100)
 
@@ -203,7 +205,7 @@ object RPiMain
 
     println("test sense stick\nmove the stick to test\npush down to exit")
     val stick = SenseHAT.stick
-    var code = stick.read
+    var code = stick.read(1000)
     while(SenseHAT.kENTER != code)
     {
       println(code)
@@ -269,13 +271,85 @@ object RPiMain
       {
         println("backward at speed " + speed)
         dc1.backward
-        dc2.forward
+        dc2.backward
       }
     }
     println("release the motor")
     dc1.release
     dc2.release
   }
+
+  def testMotorHAT2:Unit=
+  {
+    println("test Motor HAT2")
+    import psksvp.RPi._
+    PWMDevice.using
+
+    val motorHAT = new MotorHAT
+    val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
+    val dc2 = motorHAT.attachDevice[DCMotor](channel = 0)
+    var speed0 = 10
+    var speed1 = 10
+    while(0 != speed0)
+    {
+      print("enter speed0:")
+      speed0 = scala.io.StdIn.readInt()
+      print("enter speed1:")
+      speed1 = scala.io.StdIn.readInt()
+      if(speed0 > 0)
+      {
+        println("forward at speed0 " + speed0)
+        dc1.setSpeed(Math.abs(speed0))
+        dc1.forward
+      }
+      else if(speed0 < 0)
+      {
+        println("backward at speed0 " + speed0)
+        dc1.setSpeed(Math.abs(speed0))
+        dc1.backward
+      }
+
+      if(speed1 > 0)
+      {
+        println("forward at speed1 " + speed1)
+        dc2.setSpeed(Math.abs(speed1))
+        dc2.forward
+      }
+      else if(speed1 < 0)
+      {
+        println("backward at speed1 " + speed1)
+        dc2.setSpeed(Math.abs(speed1))
+        dc2.backward
+      }
+    }
+    println("release the motor")
+    dc1.release
+    dc2.release
+  }
+
+  def testESC:Unit=
+  {
+    println("test Motor ESC")
+    import psksvp.RPi._
+    PWMDevice.using
+
+    val pwmHat = new PWMHAT
+    val esc = pwmHat.attachDevice[Servo](channel=4)
+
+    while(true)
+    {
+      print("enter an speed(-128, 128):")
+      val speed = scala.io.StdIn.readInt()
+      if(speed > 128)
+      {
+        esc.set(0)
+        return
+      }
+      else
+        esc.set(speed)
+    }
+  }
+
 
   def testGPIO:Unit=
   {

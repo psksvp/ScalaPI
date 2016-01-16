@@ -42,10 +42,10 @@ import scala.collection.immutable.Range
   */
 abstract class PWMDevice extends
 {
-  private var pwm:Option[PWMController] = None
+  private var pwm:Option[PWMI2CEndPoint] = None
   private var channel = -1
 
-  def init(h:Option[PWMController], ch:Int):Unit=
+  def init(h:Option[PWMI2CEndPoint], ch:Int):Unit=
   {
     pwm = h
     channel = ch
@@ -161,7 +161,7 @@ class DCMotor extends MotorPWMDevice
 
   def createSelf:PWMDevice = new DCMotor
 
-  override def init(h:Option[PWMController], ch:Int):Unit=
+  override def init(h:Option[PWMI2CEndPoint], ch:Int):Unit=
   {
     require(ch >= 0 && ch < 4)
     super.init(h, ch)
@@ -242,7 +242,7 @@ class StepperMotor(steps:Int=200,
 
   def createSelf:PWMDevice = new StepperMotor
 
-  override def init(h:Option[PWMController], ch:Int):Unit=
+  override def init(h:Option[PWMI2CEndPoint], ch:Int):Unit=
   {
     require(0 == ch || 1 == ch)
     super.init(h, ch)

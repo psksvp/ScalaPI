@@ -40,7 +40,7 @@ abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int
   for(i <- ports.indices)
     ports(i) = None
 
-  def pwmController:PWMController
+  def pwmController:PWMI2CEndPoint
 
   def attachDevice[D:ClassTag](channel:Int):D =
   {
@@ -67,16 +67,24 @@ abstract class AdaFruitPWMI2CBoard[T <: PWMDevice](nChennels:Int, i2cAddress:Int
     {
       case Some(channel) => ports(channel).get.init(None, -1)
                             ports(channel) = None
+                            println("device " + device + " was detached")
       case _             =>
     }
+
+    println("device " + device + " was NOT attached with this board " + this)
   }
 
   def getChannelOfDevice(pwmDevice: T):Option[Int]=
   {
     for(i <- ports.indices)
     {
-      if(ports(i).get == pwmDevice)
-        return Some(i)
+      ports(i) match
+      {
+        case Some(device) =>
+          if(device == pwmDevice)
+            Some(i)
+        case _ =>
+      }
     }
     None
   }
