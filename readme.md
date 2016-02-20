@@ -340,8 +340,12 @@ object RPiMain
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
-## Note
-I am a dreamer. I believe that all human are intelligence enough.
+## Disclaimer
+This information is provided for personal educational purposes only.
+
+The author does not guarantee the accuracy of this information.
+
+By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  
 ## Acknowledgement
 * Use code from https://github.com/adamheinrich/native-utils for loading shared lib from jar.
