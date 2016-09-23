@@ -1,4 +1,4 @@
-JNI_INCLUDE=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/include
+JNI_INCLUDE=/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include
 JNI_LINUX=$(JNI_INCLUDE)/linux
 
 GenI2CJNI:PiI2C.i

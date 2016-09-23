@@ -33,7 +33,7 @@ package psksvp.Math
 /**
   * Created by psksvp on 29/11/2015.
   */
-class ScaleValue(inMin:Double, inMax:Double, outMin:Double, outMax:Double)
+class RangeScaler(inMin:Double, inMax:Double, outMin:Double, outMax:Double)
 {
   private val inRange = inMax - inMin
   private val outRange = outMax - outMin

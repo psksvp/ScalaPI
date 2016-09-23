@@ -29,57 +29,29 @@ The BSD 3-Clause License
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   **/
 
-package psksvp.Math
+package psksvp.Concurrency
 
 /**
- * Created by psksvp on 17/05/2014.
- */
-class Fraction(P:Int, Q:Int)
+  * Created by psksvp on 12/12/2015.
+  * based on apache BooleanLatch
+  */
+class BooleanLatch
 {
-  require(Q != 0)
-
-  def numerator=P
-  def denominator=Q
-  def toDoublet: Double=numerator/denominator
-  def toFloat: Float=numerator/denominator
-
-  def + (a: Fraction): Fraction =
+  import java.util.concurrent.locks.AbstractQueuedSynchronizer
+  final class Sync extends AbstractQueuedSynchronizer
   {
-    val N = this.numerator * a.denominator + this.denominator * a.numerator
-    val M = this.denominator * a.denominator
-    new Fraction(N, M)
+    def signalled = 0 !=getState
+    override def tryAcquireShared(ignore:Int) = if(signalled) 1 else -1
+    override def tryReleaseShared(ignore:Int) :Boolean=
+    {
+      setState(1);
+      true
+    }
   }
 
-  def - (a: Fraction): Fraction =
-  {
-    val N = this.numerator * a.denominator - this.denominator * a.numerator
-    val M = this.denominator * a.denominator
-    new Fraction(N, M)
-  }
-
-  def * (a: Fraction): Fraction = new Fraction(this.numerator * a.numerator,this.denominator * a.denominator)
-  def / (a: Fraction): Fraction = new Fraction(this.numerator * a.denominator, this.denominator * a.numerator)
-  def ** (n: Int) : Fraction =
-  {
-    require(n != 0)
-
-    val a = math.pow(this.numerator, n).toInt
-    val b = math.pow(this.denominator, n).toInt
-
-    if(n > 0)
-      new Fraction(a, b)
-    else
-      new Fraction(b, a)
-  }
-
-  def == (a: Fraction): Boolean = this.numerator * a.denominator == this.denominator * a.numerator
-  def < (a: Fraction): Boolean = this.numerator * a.denominator < this.denominator * a.numerator
-  def > (a: Fraction): Boolean = this.numerator * a.denominator > this.denominator * a.numerator
-
-  override def toString: String =  "[" + this.numerator + "/" + this.denominator + "]"
-}
-
-object Fraction
-{
-  def apply(P:Int, Q:Int):Fraction = new Fraction(P, Q)
+  private val sync = new Sync
+  def signalled = sync.signalled
+  def signal = sync.releaseShared(1)
+  def await = sync.acquireInterruptibly(1)
+  def await(timeout:Long) = sync.tryAcquireNanos(1, timeout)
 }

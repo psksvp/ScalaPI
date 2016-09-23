@@ -101,8 +101,8 @@ object PWMDevice
                                              // unsure why 150 to 600, just copy from adafruit code
 abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) extends PWMDevice
 {
-  import psksvp.Math.ScaleValue
-  private val scale = new ScaleValue(logicalRange.min, logicalRange.max, rawRange.min, rawRange.max)
+  import psksvp.Math.RangeScaler
+  private val scale = new RangeScaler(logicalRange.min, logicalRange.max, rawRange.min, rawRange.max)
 
   def set(value:Int):Unit=
   {

@@ -54,10 +54,20 @@ abstract class Rule
 {
   def evolve(life:LifeWorld): Unit
   def numberOfStates: Int
+  def charOfState(s:Int):Char
 }
 
 class BrianBrain extends Rule
 {
+  final val DEAD = 0
+  final val ALIVE = 1
+  final val DYING = 2
+  private val charStates = Array(' ', 'O', '+')
+  override def charOfState(s:Int):Char=
+  {
+    require(s >= 0 && s < numberOfStates)
+    charStates(s)
+  }
   override def numberOfStates: Int = 3
   override def evolve(life:LifeWorld): Unit =
   {
@@ -66,9 +76,9 @@ class BrianBrain extends Rule
     {
       life(r, c) match
       {
-        case 0 => if(1 == life.countNeighbors(r, c)) life(r, c) = 1
-        case 1 => life(r, c) = 2
-        case 2 => life(r, c) = 0
+        case DEAD => if(2 == life.countNeighbors(r, c)) life(r, c) = ALIVE
+        case ALIVE => life(r, c) = DYING
+        case DYING => life(r, c) = DEAD
       }
     }
   }
@@ -76,6 +86,14 @@ class BrianBrain extends Rule
 
 class Conway extends Rule
 {
+  final val DEAD = 0
+  final val ALIVE = 1
+  private val charStates = Array(' ', '#')
+  override def charOfState(s:Int):Char=
+  {
+    require(s >= 0 && s < numberOfStates)
+    charStates(s)
+  }
   override def numberOfStates: Int = 2
   override def evolve(life:LifeWorld): Unit =
   {
@@ -85,9 +103,10 @@ class Conway extends Rule
       val neighbors = life.countNeighbors(r, c)
       life(r, c) match
       {
-        case 0 => if(2 == neighbors) life(r, c) = 1
-        case 1 => if(neighbors < 2 || neighbors > 4) life(r, c) = 0
+        case DEAD => if(3 == neighbors) life(r, c) = ALIVE
+        case ALIVE => if(neighbors < 2 || neighbors >= 4) life(r, c) = DEAD
       }
     }
   }
 }
+

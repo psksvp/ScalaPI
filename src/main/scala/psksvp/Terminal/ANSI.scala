@@ -22,14 +22,14 @@ object ANSI
   final val concealed = 8
 
 
-  def setCursor(row:Int, col:Int) = s"$esc$row,$col" + 'H'
-  def cursorUp(n:Int) = s"$esc$n" + 'A'
-  def cursorDown(n:Int) = s"$esc$n" + 'B'
-  def cursorForward(n:Int) = s"$esc$n" + 'C'
-  def cursorBackward(n:Int) = s"$esc$n" + 'D'
-  def clearScreen = esc + "2J"
-  def clearLine = esc + "K"
-  def setForegroundColor(c:Int) = esc + c + "m"
-  def setBackgroundColor(c:Int) = esc + (c+10) + "m"
-  def setTextAttribute(a:Int) = esc + a + "m"
+  def setCursor(row:Int, col:Int) = print(s"$esc$row;$col" + 'H')
+  def cursorUp(n:Int) = print(s"$esc$n" + 'A')
+  def cursorDown(n:Int) = print(s"$esc$n" + 'B')
+  def cursorForward(n:Int) = print(s"$esc$n" + 'C')
+  def cursorBackward(n:Int) = print(s"$esc$n" + 'D')
+  def clearScreen = print(esc + "2J")
+  def clearLine = print(esc + "K")
+  def setForegroundColor(c:Int) = print(esc + c + "m")
+  def setBackgroundColor(c:Int) = print(esc + (c+10) + "m")
+  def setTextAttribute(a:Int) = print(esc + a + "m")
 }
