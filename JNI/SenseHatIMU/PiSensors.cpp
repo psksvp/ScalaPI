@@ -59,7 +59,7 @@ namespace PiSensors
   {
     if(NULL == mySetting)
     {
-      mySetting = new RTIMUSettings("~/.config/RTIMULib");
+      mySetting = new RTIMUSettings("/etc/RTIMULib");
       
       myIMU = RTIMU::createIMU(mySetting);
       if((myIMU == NULL) || (myIMU->IMUType() == RTIMU_TYPE_NULL))
