@@ -35,6 +35,7 @@
 #include <RTIMULib.h>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include "PiSensors.h"
 
 #include <unistd.h>
