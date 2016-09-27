@@ -73,7 +73,8 @@ namespace PiSensors
         homedir = getpwuid(getuid())->pw_dir;
       }
       
-      std::string strINIPath = homedir + "/.config/RTIMULib";
+      std::string strHomePath = homedir;
+      std::string strINIPath = strHomePath + "/.config/RTIMULib";
       
       
       mySetting = new RTIMUSettings(strINIPath.c_str());
