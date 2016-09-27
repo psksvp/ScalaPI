@@ -75,7 +75,7 @@ namespace PiSensors
       
       if(NULL == homedir)
       {
-        std::fprintf(stderr, "error getting home path while loading RTIMULib.ini")
+        std::fprintf(stderr, "error getting home path while loading RTIMULib.ini");
         return false;
       }
       
