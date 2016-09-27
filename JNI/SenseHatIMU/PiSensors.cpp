@@ -34,7 +34,14 @@
 
 #include <RTIMULib.h>
 #include <cstdio>
+#include <cstring>
 #include "PiSensors.h"
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
+
 
 namespace PiSensors
 {
@@ -59,7 +66,17 @@ namespace PiSensors
   {
     if(NULL == mySetting)
     {
-      mySetting = new RTIMUSettings("/etc/RTIMULib");
+      const char *homedir;
+      
+      if ((homedir = getenv("HOME")) == NULL)
+      {
+        homedir = getpwuid(getuid())->pw_dir;
+      }
+      
+      String strINIPath = homedir + "/.config/RTIMULib";
+      
+      
+      mySetting = new RTIMUSettings(strINIPath);
       
       myIMU = RTIMU::createIMU(mySetting);
       if((myIMU == NULL) || (myIMU->IMUType() == RTIMU_TYPE_NULL))
