@@ -66,11 +66,17 @@ namespace PiSensors
   {
     if(NULL == mySetting)
     {
-      const char *homedir;
+      const char *homedir = NULL;
       
       if ((homedir = getenv("HOME")) == NULL)
       {
         homedir = getpwuid(getuid())->pw_dir;
+      }
+      
+      if(NULL == homedir)
+      {
+        std::fprintf(stderr, "error getting home path while loading RTIMULib.ini")
+        return false;
       }
       
       std::string strHomePath = homedir;
