@@ -76,7 +76,7 @@ namespace PiSensors
       String strINIPath = homedir + "/.config/RTIMULib";
       
       
-      mySetting = new RTIMUSettings(strINIPath);
+      mySetting = new RTIMUSettings(strINIPath.c_str());
       
       myIMU = RTIMU::createIMU(mySetting);
       if((myIMU == NULL) || (myIMU->IMUType() == RTIMU_TYPE_NULL))
