@@ -74,7 +74,7 @@ namespace PiSensors
         homedir = getpwuid(getuid())->pw_dir;
       }
       
-      String strINIPath = homedir + "/.config/RTIMULib";
+      string strINIPath = homedir + "/.config/RTIMULib";
       
       
       mySetting = new RTIMUSettings(strINIPath.c_str());
