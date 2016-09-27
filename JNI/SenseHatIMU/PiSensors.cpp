@@ -34,7 +34,6 @@
 
 #include <RTIMULib.h>
 #include <cstdio>
-#include <cstring>
 #include <string>
 #include "PiSensors.h"
 
@@ -74,7 +73,7 @@ namespace PiSensors
         homedir = getpwuid(getuid())->pw_dir;
       }
       
-      string strINIPath = homedir + "/.config/RTIMULib";
+      std::string strINIPath = homedir + "/.config/RTIMULib";
       
       
       mySetting = new RTIMUSettings(strINIPath.c_str());
