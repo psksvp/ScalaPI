@@ -22,7 +22,7 @@ buildJAR: compileScalaCode
 	cp ./JNI/i2c/libPiI2C.so ./temp/native/libPiI2C.so
 	cp ./JNI/SenseHatIMU/libPiSensors.so ./temp/native/libPiSensors.so
 	cp ./JNI/GPIO/libPiGPIO.so ./temp/native/libPiGPIO.so
-	unzip ./target/scala-2.11/scalapi_2.11-0.1.jar -d ./temp
+	unzip ./target/scala-2.12/scalapi_2.12-0.1.jar -d ./temp
 	unzip -n ./lib/PiSensors.jar -d ./temp
 	unzip -n ./lib/PiI2C.jar -d ./temp
 	unzip -n ./lib/PiGPIO.jar -d ./temp
