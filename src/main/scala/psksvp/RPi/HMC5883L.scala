@@ -70,12 +70,11 @@ class HMC5883L(address:Int=0x1e,
         value
     }
 
-    import psksvp.Loop.loop
     endPoint.write(AxisXDataRegisterMSB)
     val data = Array.ofDim[Int](6)
-    loop(6)
+    for(i <- 0 until 6)
     {
-      case i => data(i) = endPoint.read.toInt
+      data(i) = endPoint.read.toInt
     }
 
     val int1 = (data(0) << 8) | data(1)
