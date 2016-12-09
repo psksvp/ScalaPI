@@ -156,7 +156,7 @@ object RPiMain
     import psksvp.RPi.SenseHAT
     import psksvp.Terminal.ANSI
     val sensors = SenseHAT.sensors
-    var m = 10
+    var m = 20
     while(m > 0)
     {
       println(ANSI.clearScreen)
@@ -188,7 +188,7 @@ object RPiMain
         case None       => println("sensors poll fail")
       }
       Thread.sleep(1000)
-      //m = m - 1
+      m = m - 1
     }
 
     sensors.deinit

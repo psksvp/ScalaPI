@@ -56,11 +56,14 @@ object I2C
     import psksvp.jni.rpi.PiI2C
     val fd = PiI2C.wiringPiI2CSetup(address)
 
-    def read=PiI2C.wiringPiI2CRead(fd).toByte
-    def write(data:Byte)=PiI2C.wiringPiI2CWrite(fd, data.toInt)
+    def read:Byte = PiI2C.wiringPiI2CRead(fd).toByte
+    def write(data:Byte):Unit  = PiI2C.wiringPiI2CWrite(fd, data.toInt)
 
-    def read(reg:Int)=PiI2C.wiringPiI2CReadReg8(fd, reg).toByte
-    def write(reg:Int, data:Byte)=PiI2C.wiringPiI2CWriteReg8(fd, reg, data.toInt)
+    def read(reg:Int):Byte = PiI2C.wiringPiI2CReadReg8(fd, reg).toByte
+    def write(reg:Int, data:Byte):Unit = PiI2C.wiringPiI2CWriteReg8(fd, reg, data.toInt)
+
+    def readInt16(reg:Int):Int = PiI2C.wiringPiI2CReadReg16(fd, reg)
+    def writeInt16(reg:Int, data:Short) = PiI2C.wiringPiI2CWriteReg16(fd, reg, data)
   }
 
   def makeConnection(endPointAddress:Int) = new EndPointDevice(endPointAddress)

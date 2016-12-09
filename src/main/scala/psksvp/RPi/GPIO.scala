@@ -48,9 +48,9 @@ object GPIO
     }
   }
   catch
-    {
-      case e:UnsatisfiedLinkError => sys.error("Native code library failed to load.\n" + e)
-    }
+  {
+    case e:UnsatisfiedLinkError => sys.error("Native code library failed to load.\n" + e)
+  }
 
   abstract class PinMode(wiringPiCode:Int)
   {
