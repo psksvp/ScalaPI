@@ -63,6 +63,7 @@ class HMC5883L(address:Int=0x1e,
 
   def axes:(Float, Float, Float) =
   {
+    endPoint.write(AxisXDataRegisterMSB, 0x3c)
     val magx = endPoint.readInt16(AxisXDataRegisterMSB)
     val magz = endPoint.readInt16(AxisZDataRegisterMSB)
     val magy = endPoint.readInt16(AxisYDataRegisterMSB)
