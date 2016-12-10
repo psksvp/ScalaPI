@@ -70,9 +70,9 @@ class HMC5883L(address:Int=0x1e,
         value
     }
 
-    endPoint.write(AxisXDataRegisterMSB)
     val data = Array.ofDim[Int](6)
-    for(i <- 0 until 6)
+    data(0) = endPoint.read(AxisXDataRegisterMSB).toInt
+    for(i <- 1 until 6)
     {
       data(i) = endPoint.read.toInt
     }
