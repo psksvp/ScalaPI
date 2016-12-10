@@ -78,9 +78,13 @@ class HMC5883L(address:Int=0x1e,
     buffer.put(loX)
     val magx = buffer.getShort(0)
 
+    buffer.clear()
+
     buffer.put(hiZ)
     buffer.put(loZ)
     val magz = buffer.getShort(0)
+
+    buffer.clear()
 
     buffer.put(hiY)
     buffer.put(loY)
