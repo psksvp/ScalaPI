@@ -40,6 +40,7 @@ class HMC5883L(address:Int=0x1e,
 
   val endPoint = I2C.makeConnection(address)
   val scaleReg = ((scaleMap(gauss)._1 << 5) | 0x00).toByte
+  val scale = scaleMap(gauss)._2
   endPoint.write(ConfigurationRegisterB, scaleReg)
 
 
@@ -60,28 +61,30 @@ class HMC5883L(address:Int=0x1e,
     (degrees, minutes)
   }
 
-  def axes:(Int, Int, Int) =
+  def axes:(Float, Float, Float) =
   {
-    def toInt(value:Int, len:Int):Int =
-    {
-      if((value & (1 << len - 1)) != 0)
-        value - (1 << len)
-      else
-        value
-    }
+    val magx = endPoint.readInt16(AxisXDataRegisterMSB)
+    val magz = endPoint.readInt16(AxisZDataRegisterMSB)
+    val magy = endPoint.readInt16(AxisYDataRegisterMSB)
 
-    val data = Array.ofDim[Int](6)
-    data(0) = endPoint.read(AxisXDataRegisterMSB).toInt
-    for(i <- 1 until 6)
-    {
-      data(i) = endPoint.read.toInt
-    }
-
-    val int1 = (data(0) << 8) | data(1)
-    val int2 = (data(2) << 8) | data(3)
-    val int3 = (data(4) << 8) | data(5)
-
-    (toInt(int1, 16), toInt(int2, 16), toInt(int3, 16))
+    (magx * scale, magy * scale, magz * scale)
   }
 
+}
+
+object HMC5883L
+{
+  def apply():HMC5883L = new HMC5883L()
+
+  def main(args:Array[String]):Unit=
+  {
+    val h = new HMC5883L()
+    h.setContinuousMode
+    while(true)
+    {
+      println(h.axes)
+      println("heading " + h.heading)
+      Thread.sleep(1000)
+    }
+  }
 }
