@@ -63,10 +63,29 @@ class HMC5883L(address:Int=0x1e,
 
   def axes:(Float, Float, Float) =
   {
-    endPoint.write(AxisXDataRegisterMSB, 0x3c)
-    val magx = endPoint.readInt16(AxisXDataRegisterMSB)
-    val magz = endPoint.readInt16(AxisZDataRegisterMSB)
-    val magy = endPoint.readInt16(AxisYDataRegisterMSB)
+    //endPoint.write(AxisXDataRegisterMSB, 0x3c)
+    val hiX = endPoint.read
+    val loX = endPoint.read
+    val hiZ = endPoint.read
+    val loZ = endPoint.read
+    val hiY = endPoint.read
+    val loY = endPoint.read
+
+    import java.nio.ByteBuffer
+
+    val buffer = ByteBuffer.allocate(2)
+    buffer.put(hiX)
+    buffer.put(loX)
+    val magx = buffer.getShort(0)
+
+    buffer.put(hiZ)
+    buffer.put(loZ)
+    val magz = buffer.getShort(0)
+
+    buffer.put(hiY)
+    buffer.put(loY)
+    val magy = buffer.getShort(0)
+
 
     (magx * scale, magy * scale, magz * scale)
   }
