@@ -63,7 +63,7 @@ class HMC5883L(address:Int=0x1e,
 
   def axes:(Float, Float, Float) =
   {
-    //endPoint.write(AxisXDataRegisterMSB, 0x3c)
+    endPoint.write(AxisXDataRegisterMSB, 0x3c)
     val hiX = endPoint.read
     val loX = endPoint.read
     val hiZ = endPoint.read
