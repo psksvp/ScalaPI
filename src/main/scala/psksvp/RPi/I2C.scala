@@ -56,6 +56,8 @@ object I2C
     import psksvp.jni.rpi.PiI2C
     val fd = PiI2C.wiringPiI2CSetup(address)
 
+
+
     def read:Byte = PiI2C.wiringPiI2CRead(fd).toByte
     def write(data:Byte):Unit  = PiI2C.wiringPiI2CWrite(fd, data.toInt)
 

@@ -5,13 +5,13 @@ package psksvp.RPi
   * Base on https://bitbucket.org/thinkbowl/i2clibraries/src/037e6107a866eb6406fced4d0fbef197f2f131a0/i2c_hmc5883l.py?at=master&fileviewer=file-view-default
   */
 class HMC5883L(address:Int=0x1e,
-               declinationDegree:Float = 6,
-               declinationMin:Float = 0,
+               declinationDegree:Float = 0,
+               declinationMin:Float = 6,
                gauss:Float=1.3f)
 {
-  val ConfigurationRegisterA = 0x00
-  val ConfigurationRegisterB = 0x01
-  val ModeRegister = 0x02
+  val ConfigurationRegisterA:Byte = 0x00
+  val ConfigurationRegisterB :Byte = 0x01
+  val ModeRegister:Byte = 0x02
   val AxisXDataRegisterMSB:Byte = 0x03
   val AxisXDataRegisterLSB:Byte = 0x04
   val AxisZDataRegisterMSB:Byte = 0x05
@@ -39,76 +39,70 @@ class HMC5883L(address:Int=0x1e,
                       8.1f -> (0x07, 4.35f))
 
   val endPoint = I2C.makeConnection(address)
-  val scaleReg = ((scaleMap(gauss)._1 << 5) | 0x00).toByte
+  val scaleReg = (scaleMap(gauss)._1 << 5).toByte
   val scale = scaleMap(gauss)._2
   endPoint.write(ConfigurationRegisterB, scaleReg)
+  setContinuousMode
 
 
   def setContinuousMode:Unit=endPoint.write(ModeRegister, MeasurementContinuous)
 
-  def heading:(Double, Double) =
+  def heading:(Float, Float) =
   {
     val (x, y, z) = axes
-    val heading = Math.atan2(y, x) + declination
-    val headingRad = if(heading < 0)
-                       heading + (2 * Math.PI)
-                     else
-                       heading - (2 * Math.PI)
+    var headingRad = Math.atan2(y, x)
+    headingRad += declination
+    if(headingRad < 0)
+       headingRad += (2 * Math.PI)
+
+    if(headingRad >= 2 * Math.PI)
+      headingRad -= (2 * Math.PI)
 
     val headingDeg = headingRad * 180 / Math.PI
     val degrees = Math.floor(headingDeg)
-    val minutes = (heading - degrees) * 60
-    (degrees, minutes)
+    val minutes = Math.round((headingDeg - degrees) * 60)
+    (degrees.toFloat, minutes.toFloat)
   }
 
   def axes:(Float, Float, Float) =
   {
-    endPoint.write(AxisXDataRegisterMSB, 0x3c)
-    val hiX = endPoint.read
-    val loX = endPoint.read
-    val hiZ = endPoint.read
-    val loZ = endPoint.read
-    val hiY = endPoint.read
-    val loY = endPoint.read
-
-    import java.nio.ByteBuffer
-
-    val buffer = ByteBuffer.allocate(2)
-    buffer.put(hiX)
-    buffer.put(loX)
-    val magx = buffer.getShort(0)
-
-    buffer.clear()
-
-    buffer.put(hiZ)
-    buffer.put(loZ)
-    val magz = buffer.getShort(0)
-
-    buffer.clear()
-
-    buffer.put(hiY)
-    buffer.put(loY)
-    val magy = buffer.getShort(0)
+    val msbx = endPoint.read(AxisXDataRegisterMSB)
+    val lsbx = endPoint.read(AxisXDataRegisterLSB)
+    val msbz = endPoint.read(AxisZDataRegisterMSB)
+    val lsbz = endPoint.read(AxisZDataRegisterLSB)
+    val msby = endPoint.read(AxisYDataRegisterMSB)
+    val lsby = endPoint.read(AxisYDataRegisterLSB)
 
 
-    (magx * scale, magy * scale, magz * scale)
+    import psksvp.Bits.s16From2Bytes
+    val magx = s16From2Bytes(msbx, lsbx)
+    val magz = s16From2Bytes(msbz, lsbz)
+    val magy = s16From2Bytes(msby, lsby)
+
+    import psksvp.Math.round
+    (round(magx * scale, 4), round(magy * scale, 4), round(magz * scale, 4))
   }
 
 }
 
 object HMC5883L
 {
-  def apply():HMC5883L = new HMC5883L()
+  def apply(address:Int=0x1e,
+            declinationDegree:Float = 0,
+            declinationMin:Float = 6,
+            gauss:Float=1.3f):HMC5883L = new HMC5883L(address, declinationDegree, declinationMin, gauss)
 
   def main(args:Array[String]):Unit=
   {
     val h = new HMC5883L()
-    h.setContinuousMode
     while(true)
     {
-      println(h.axes)
+      psksvp.Terminal.ANSI.clearScreen
+      psksvp.Terminal.ANSI.setCursor(0, 0)
       println("heading " + h.heading)
-      Thread.sleep(1000)
+      println("x, y, z " + h.axes)
+      Thread.sleep(500)
     }
   }
 }
+
