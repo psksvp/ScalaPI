@@ -4,7 +4,6 @@ Scala classes to control the
 
 * GPIO
 * i2c
-* PiCamera (CSL interface)
 * SenseHAT  https://www.raspberrypi.org/products/sense-hat/
 * Adafruit PWM HAT https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi/overview
 * Adafruit Stepper/DC Motor HAT https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/overview
@@ -352,3 +351,6 @@ By using the provided information, libraries or software, you solely take the ri
 * The native libs use wiringPi (http://wiringpi.com) and RTIMUlib (https://github.com/richards-tech/RTIMULib)
 * PWMHAT and MotorHAT classes were written by looking at python code from Adafruit (https://github.com/adafruit).
  
+## Testing 
+
+> $$y = x ^ 2 + cos(x)$$ (1)
