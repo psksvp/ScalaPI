@@ -135,21 +135,21 @@ namespace PiSensors
     {
       RTIMU_DATA data = myIMU->getIMUData();
       
-      env.pose.roll = data.fusionPose.x() * RTMATH_RAD_TO_DEGREE;
-      env.pose.pitch = data.fusionPose.y() * RTMATH_RAD_TO_DEGREE;
-      env.pose.yaw = data.fusionPose.z() * RTMATH_RAD_TO_DEGREE;
+      env.pose.roll = data.fusionPose.x()  ;
+      env.pose.pitch = data.fusionPose.y() ;
+      env.pose.yaw = data.fusionPose.z()   ;
       
-      env.gyro.roll = data.gyro.x() * RTMATH_RAD_TO_DEGREE;
-      env.gyro.pitch = data.gyro.y() * RTMATH_RAD_TO_DEGREE;
-      env.gyro.yaw = data.gyro.z() * RTMATH_RAD_TO_DEGREE;
+      env.gyro.roll = data.gyro.x() ;
+      env.gyro.pitch = data.gyro.y();
+      env.gyro.yaw = data.gyro.z()  ;
       
-      env.accel.roll = data.accel.x() * RTMATH_RAD_TO_DEGREE;
-      env.accel.pitch = data.accel.y() * RTMATH_RAD_TO_DEGREE;
-      env.accel.yaw = data.accel.z() * RTMATH_RAD_TO_DEGREE;
+      env.accel.roll = data.accel.x() ;
+      env.accel.pitch = data.accel.y();
+      env.accel.yaw = data.accel.z()  ;
       
-      env.compass.roll = data.compass.x() * RTMATH_RAD_TO_DEGREE;
-      env.compass.pitch = data.compass.y() * RTMATH_RAD_TO_DEGREE;
-      env.compass.yaw = data.compass.z() * RTMATH_RAD_TO_DEGREE;
+      env.compass.roll = data.compass.x()  ;
+      env.compass.pitch = data.compass.y() ;
+      env.compass.yaw = data.compass.z()   ;
     
     
       if(NULL != myHumidity)
