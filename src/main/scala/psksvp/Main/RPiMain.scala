@@ -1,33 +1,39 @@
-/**
-The BSD 3-Clause License
- Copyright (c) 2015, Pongsak Suvanpong (psksvp@gmail.com)
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and/or other materials provided with the distribution.
-
- 3. Neither the name of the copyright holder nor the names of its contributors may
- be used to endorse or promote products derived from this software without
- specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  **/
+/*
+ *  The BSD 3-Clause License
+ *  Copyright (c) 2018. by Pongsak Suvanpong (psksvp@gmail.com)
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *  this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *  this list of conditions and the following disclaimer in the documentation
+ *  and/or other materials provided with the distribution.
+ *
+ *  3. Neither the name of the copyright holder nor the names of its contributors may
+ *  be used to endorse or promote products derived from this software without
+ *  specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ *  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This information is provided for personal educational purposes only.
+ *
+ * The author does not guarantee the accuracy of this information.
+ *
+ * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
+ */
 
 package psksvp.Main
 
@@ -137,17 +143,13 @@ object RPiMain
     val nSample = 50
     while(true)
     {
-      var sum = 0.0
-      for(i <- 1 to nSample)
+      sensors.poll() match
       {
-        sensors.poll match
-        {
-          case Some(data) => sum = sum + data.heading
-          case None       =>
-        }
-        Thread.sleep(10)
+        case Some(data) => val (deg, min) = data.heading()
+                           println("heading ->" +  deg + " " + min)
+        case None       =>
       }
-      println("heading ->" + (sum / nSample) + " -> " + Math.round(sum / nSample))
+      Thread.sleep(10)
     }
   }
 
@@ -157,11 +159,11 @@ object RPiMain
     import psksvp.Terminal.ANSI
     val sensors = SenseHAT.sensors
     var m = 20
-    while(m > 0)
+    while(true)
     {
       println(ANSI.clearScreen)
       println(ANSI.setCursor(0, 0))
-      sensors.poll match
+      sensors.poll() match
       {
         case Some(data) => println("humidity     -> " + data.environment.humidity)
                            println("pressure     -> " + data.environment.pressure)
@@ -184,10 +186,11 @@ object RPiMain
                            println("compass pitch-> " + data.compass.pitch)
                            println("compass yaw  -> " + data.compass.yaw)
                            println("====================================================")
-                           println("compass heading => " + data.heading)
+                           val (deg, min) = data.heading()
+                           println("compress heading ->" +  deg + " " + min)
         case None       => println("sensors poll fail")
       }
-      Thread.sleep(1000)
+      Thread.sleep(500)
       m = m - 1
     }
 
@@ -226,7 +229,7 @@ object RPiMain
   {
     println("TestServo PWM")
     import psksvp.RPi.{Servo, PWMHAT}
-    PWMDevice.using
+    PWMDevice.initAll()
     val pwmHat = new PWMHAT
     val servo0 = pwmHat.attachDevice[Servo](channel=0)
     val servo1 = pwmHat.attachDevice[Servo](channel=15)
@@ -249,7 +252,7 @@ object RPiMain
   {
     println("test Motor HAT")
     import psksvp.RPi._
-    PWMDevice.using
+    PWMDevice.initAll()
 
     val motorHAT = new MotorHAT
     val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
@@ -283,7 +286,7 @@ object RPiMain
   {
     println("test Motor HAT2")
     import psksvp.RPi._
-    PWMDevice.using
+    PWMDevice.initAll()
 
     val motorHAT = new MotorHAT
     val dc1 = motorHAT.attachDevice[DCMotor](channel = 1)
@@ -331,7 +334,7 @@ object RPiMain
   {
     println("test Motor ESC")
     import psksvp.RPi._
-    PWMDevice.using
+    PWMDevice.initAll()
 
     val pwmHat = new PWMHAT
     val esc = pwmHat.attachDevice[Servo](channel=4)
@@ -353,9 +356,7 @@ object RPiMain
 
   def testGPIO:Unit=
   {
-    import psksvp.RPi.GPIO
-    val outPin = GPIO.getOutputPin(0)
-    outPin.digitalWrite(GPIO.HIGH())
+
   }
 }
 

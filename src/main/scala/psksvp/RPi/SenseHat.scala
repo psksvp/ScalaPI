@@ -1,33 +1,39 @@
-/**
-The BSD 3-Clause License
- Copyright (c) 2015, Pongsak Suvanpong (psksvp@gmail.com)
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and/or other materials provided with the distribution.
-
- 3. Neither the name of the copyright holder nor the names of its contributors may
- be used to endorse or promote products derived from this software without
- specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  **/
+/*
+ *  The BSD 3-Clause License
+ *  Copyright (c) 2018. by Pongsak Suvanpong (psksvp@gmail.com)
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *  this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *  this list of conditions and the following disclaimer in the documentation
+ *  and/or other materials provided with the distribution.
+ *
+ *  3. Neither the name of the copyright holder nor the names of its contributors may
+ *  be used to endorse or promote products derived from this software without
+ *  specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ *  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This information is provided for personal educational purposes only.
+ *
+ * The author does not guarantee the accuracy of this information.
+ *
+ * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
+ */
 
 package psksvp.RPi
 
@@ -120,7 +126,7 @@ object SenseHAT
       update
     }
 
-    def setPixel(x:Int, y:Int, color:(Int, Int, Int), redraw:Boolean=false): Unit =
+    def setPixel(x:Int, y:Int, color:(Int, Int, Int), redraw:Boolean = false): Unit =
     {
       def packRGB(red:Int, green:Int, blue:Int):Array[Byte]=
       {
@@ -276,18 +282,18 @@ object SenseHAT
     ledDisplay match
     {
       case Some(led) => led
-      case None      =>
-        findFrameBufferDevicePath match
-        {
-          case Some(path) => ledDisplay = Some(new LEDDisplay(path))
-                             ledDisplay.get
-          case None       => sys.error("frame buffer does not exist at SenseHat.LEDDisplay")
-        }
+      case None      => findFrameBufferDevicePath match
+                        {
+                          case Some(path) => ledDisplay = Some(new LEDDisplay(path))
+                                             ledDisplay.get
+                          case None       => sys.error("frame buffer does not exist at SenseHat.LEDDisplay")
+                        }
+
     }
   }
 
   //////////////////// IMU ///////////////////////
-  class SensorDevice
+  class Sensors
   {
     import psksvp.jni.rpi.{PiSensors, SensorData}
     class SensorValues(data:SensorData)
@@ -295,19 +301,28 @@ object SenseHAT
       case class Environment(humidity:Double, pressure:Double, height:Double, temperature:Double)
       case class Orientation(roll:Double, pitch:Double, yaw:Double)
 
-      def valid=data.getValid
+      def valid:Boolean=data.getValid
       def environment = Environment(data.getHumidity, data.getPressure,data.getHeight, data.getTemperature)
       def gyro = Orientation(data.getGyro.getRoll, data.getGyro.getPitch, data.getGyro.getYaw)
       def accelerometer = Orientation(data.getAccel.getRoll, data.getAccel.getPitch, data.getAccel.getYaw)
       def pose = Orientation(data.getPose.getRoll, data.getPose.getPitch, data.getPose.getYaw)
       def compass = Orientation(data.getCompass.getRoll, data.getCompass.getPitch, data.getCompass.getYaw)
-      def heading:Double=
+      def heading(declinationDegree:Float = 0,
+                  declinationMin:Float = 6):(Float, Float)=
       {
-        val heading = (Math.atan2(data.getCompass.getPitch, data.getCompass.getRoll) * 180.0) / Math.PI
-        if (heading < 0.0)
-          heading + 360.0
-        else
-          heading
+        var headingRad = Math.atan2(data.getCompass.getPitch, data.getCompass.getRoll)
+        val declination = (declinationDegree + declinationMin / 60f) * (Math.PI / 180f)
+        headingRad += declination
+        if(headingRad < 0)
+          headingRad += (2 * Math.PI)
+
+        if(headingRad >= 2 * Math.PI)
+          headingRad -= (2 * Math.PI)
+
+        val headingDeg = headingRad * 180 / Math.PI
+        val degrees = Math.floor(headingDeg)
+        val minutes = Math.round((headingDeg - degrees) * 60)
+        (degrees.toFloat, minutes.toFloat)
       }
     }
 
@@ -315,10 +330,6 @@ object SenseHAT
     {
       try
       {
-        //val cwd = (new java.io.File(".")).getCanonicalPath
-        //psksvp.FileSystem.SimpleFileIO.setLibraryPath(cwd)
-        //System.loadLibrary("PiSensors")
-
         import psksvp.FileSystem.SimpleFileIO
         SimpleFileIO.loadNativeLibraryFromJar("/native/libPiSensors.so")
 
@@ -331,23 +342,26 @@ object SenseHAT
       }
     }
 
-    def deinit:Unit=PiSensors.stop()
-    def poll:Option[SensorValues]=
+    def deinit():Unit=PiSensors.stop()
+    def poll(tries:Int = 10):Option[SensorValues]=
     {
       val data = new SensorValues(PiSensors.poll())
       if(data.valid)
         Some(data)
+      else if(tries <= 0)
+        None
       else
       {
-        println("SenseHat.pollSensors data are not valid")
-        None
+        Thread.sleep(10)
+        poll(tries - 1)
       }
+
     }
   }
 
-  private lazy val sensorDevice = new SensorDevice
+  private lazy val sensorDevice = new Sensors
   private lazy val sensorsReady = sensorDevice.init
-  def sensors:SensorDevice=
+  def sensors:Sensors=
   {
     if(sensorsReady)
       sensorDevice
@@ -446,5 +460,45 @@ object SenseHAT
         }
     }
 
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  ///
+  //////////////////////////////////////////////////////////////////////
+  class WebService(port:Int) extends psksvp.NanoREST.Service("SenseHat", port)
+  {
+    import psksvp.Common.StringWithNumericalValue._
+
+    get("/routes")
+    {
+      response(toString)
+    }
+
+    get("/pixels/:row/:column/:red/:green/:blue")
+    {
+      val row = colon("row").getOrElse(Seq("None")).head
+      val col = colon("column").getOrElse(Seq("None")).head
+      val red = colon("red").getOrElse(Seq("None")).head
+      val green = colon("green").getOrElse(Seq("None")).head
+      val blue = colon("blue").getOrElse(Seq("None")).head
+
+      (row.asIntValue, col.asIntValue, red.asIntValue, green.asIntValue, blue.asIntValue) match
+      {
+        case (Some(r), Some(c), Some(cr), Some(cg), Some(cb)) => display.setPixel(c, r, (cr, cg, cb), true)
+        case _  =>
+      }
+      response("OK")
+    }
+
+    get("/pixels/clear")
+    {
+      display.clear
+      response("OK")
+    }
+  }
+
+  def main(args:Array[String]):Unit =
+  {
+    new WebService(8080).run()
   }
 }

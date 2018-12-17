@@ -35,13 +35,38 @@
  * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  */
 
-package psksvp.Concurrency
+package psksvp.RPi
 
-/**
-  * Created by psksvp on 25/11/2015.
-  */
-abstract class DataProcessor
+import psksvp.RPi.GPIO._
+
+class HCSR04(trigPin:OutputPin, echoPin:InputPin)
 {
-  def run:Unit
-  def stop:Unit
+  import psksvp.Concurrency._
+
+  def distance:Double =
+  {
+    trigPin.digitalWrite(LOW())
+    microSecondWait(5)
+    trigPin.digitalWrite(HIGH())
+    microSecondWait(10)
+    trigPin.digitalWrite(LOW())
+
+    val duration =  echoPin.digitalRead()
+
+    (duration / 2.0) / 29.1
+  }
+}
+
+object HCSR04
+{
+  def main(args:Array[String]):Unit =
+  {
+    val h = new HCSR04(GPIO.output(29), GPIO.input(28))
+    import psksvp.ControlFlow._
+    repeatBlock(10)
+    {
+      println(h.distance)
+      Thread.sleep(1000)
+    }
+  }
 }

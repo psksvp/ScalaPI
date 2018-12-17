@@ -35,13 +35,9 @@
  * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  */
 
-package psksvp.Concurrency
+package psksvp.RPi
 
-/**
-  * Created by psksvp on 25/11/2015.
-  */
-abstract class DataProcessor
+class Camera
 {
-  def run:Unit
-  def stop:Unit
+
 }

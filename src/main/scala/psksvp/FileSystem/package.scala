@@ -35,13 +35,78 @@
  * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  */
 
-package psksvp.Concurrency
+package psksvp
 
-/**
-  * Created by psksvp on 25/11/2015.
-  */
-abstract class DataProcessor
+package object FileSystem
 {
-  def run:Unit
-  def stop:Unit
+  import java.io.File
+  /**
+    *
+    * @param code
+    * @param fileExt
+    * @return
+    */
+  def toFile(code:String, fileExt:String = ".c"):String=
+  {
+    import java.io.PrintWriter
+    var tmpDir = System.getProperty("java.io.tmpdir")
+    if(tmpDir.last != '/') tmpDir = tmpDir + "/"
+    val file = scala.util.Random.alphanumeric.take(10).mkString
+    val fileName = tmpDir + file + fileExt
+    new PrintWriter(fileName)
+    {
+      write(code)
+      close()
+    }
+    fileName
+  }
+
+  def fromFile(path:String):String = readString(path)
+
+  def copyFile(path:String, toDir:String):Int =
+  {
+    import sys.process._
+    Seq("cp", path, s"$toDir/.").!
+  }
+
+  def makeDirectory(path:String):Int=
+  {
+    import sys.process._
+    Seq("mkdir", "-p", path).!
+  }
+
+  def fileExists(path:String):Boolean = new java.io.File(path).exists()
+
+  def writeString(s:String, toFileAtPath:String):Unit=
+  {
+    import java.io.PrintWriter
+    new PrintWriter(toFileAtPath)
+    {
+      write(s)
+      close()
+    }
+  }
+
+  def readString(fromFileAtPath:String):String =
+  {
+    import sys.process._
+    Seq("cat", fromFileAtPath).!!
+  }
+
+  //https://alvinalexander.com/scala/how-to-list-files-in-directory-filter-names-scala
+  def listFiles(dir: File, extensions: List[String]): List[File] =
+  {
+    dir.listFiles.filter(_.isFile).toList.filter
+    {
+      file => extensions.exists(file.getName.endsWith(_))
+    }
+  }
+
+  def seqToString[T](ls:Seq[T], separator:String=" "):String =
+  {
+    if(ls.isEmpty) ""
+    else s"${ls.head.toString} ${seqToString(ls.tail, separator)}"
+  }
+
+  lazy val home:String = System.getProperty("user.home")
 }

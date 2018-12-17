@@ -1,33 +1,39 @@
-/**
-The BSD 3-Clause License
- Copyright (c) 2015, Pongsak Suvanpong (psksvp@gmail.com)
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and/or other materials provided with the distribution.
-
- 3. Neither the name of the copyright holder nor the names of its contributors may
- be used to endorse or promote products derived from this software without
- specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  **/
+/*
+ *  The BSD 3-Clause License
+ *  Copyright (c) 2018. by Pongsak Suvanpong (psksvp@gmail.com)
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *  this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *  this list of conditions and the following disclaimer in the documentation
+ *  and/or other materials provided with the distribution.
+ *
+ *  3. Neither the name of the copyright holder nor the names of its contributors may
+ *  be used to endorse or promote products derived from this software without
+ *  specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ *  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This information is provided for personal educational purposes only.
+ *
+ * The author does not guarantee the accuracy of this information.
+ *
+ * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
+ */
 package psksvp.RPi
 
 import scala.collection.immutable.Range
@@ -84,7 +90,7 @@ object PWMDevice
     None
   }
 
-  def using:Unit=
+  def initAll():Unit=
   {
     PWMDevice.registerDevice(new Servo)
     PWMDevice.registerDevice(new ESC)
@@ -102,7 +108,7 @@ object PWMDevice
 abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) extends PWMDevice
 {
   import psksvp.Math.RangeScaler
-  private val scale = new RangeScaler(logicalRange.min, logicalRange.max, rawRange.min, rawRange.max)
+  private val scale = RangeScaler(logicalRange.min, logicalRange.max, rawRange.min, rawRange.max)
 
   def set(value:Int):Unit=
   {
@@ -120,7 +126,32 @@ abstract class RangePWMDevice(logicalRange:Range, rawRange:Range=(145 to 650)) e
   */
 class Servo(armAngleRange:Range=0 to 180) extends RangePWMDevice(armAngleRange)
 {
+  override def init(h: Option[PWMI2CEndPoint], ch: Int): Unit =
+  {
+    super.init(h, ch)
+    moveTo(90)
+  }
+
+  private var currentAngle:Int = 0
+
+  def angle:Int = currentAngle
   def createSelf:PWMDevice = new Servo
+  def moveTo(angle:Int):Unit =
+  {
+    set(angle)
+    currentAngle = angle
+  }
+}
+
+
+object ESC
+{
+  abstract class Direction
+  case class Forward() extends Direction
+  case class Reverse() extends Direction
+  case class Break() extends Direction
+  case class Stop() extends Direction
+  case class Command(direction:Direction, power:Int)
 }
 
 /**
@@ -128,15 +159,86 @@ class Servo(armAngleRange:Range=0 to 180) extends RangePWMDevice(armAngleRange)
   */
 class ESC() extends RangePWMDevice(-128 to 128)
 {
+  import ESC._
+
   def createSelf:PWMDevice = new ESC
+
+  abstract class State
+  case class StopState() extends State
+  case class ForwardState(power:Int) extends State
+  case class ReverseState(power:Int) extends State
+
+  private var currentState:State = StopState()
+
+  def state:State = currentState
+
+  override def init(h: Option[PWMI2CEndPoint], ch: Int): Unit =
+  {
+    super.init(h, ch)
+    stop()
+  }
+
+  def execute(command:Command):Unit = command match
+  {
+    case Command(_:Forward, power) => forward(power)
+    case Command(_:Reverse, power) => reverse(power)
+    case Command(_:Break, _)       => break()
+    case Command(_:Stop, _)        => stop()
+    case _                         => ()
+  }
+
+  def stop():Unit =
+  {
+    set(0)
+    currentState = StopState()
+    //println(s"ESC current state : $currentState")
+  }
+
+  def forward(amount:Int):Unit =
+  {
+    currentState match
+    {
+      case ReverseState(_) => stop()
+      case _               =>
+    }
+
+    val v = psksvp.Math.clamp(amount, 0, 128)
+    set(v)
+    currentState = ForwardState(v)
+    //println(s"ESC current state : $currentState")
+  }
+
+  def reverse(amount:Int):Unit =
+  {
+    val v = psksvp.Math.clamp(amount, 0, 128)
+    currentState match
+    {
+      case ForwardState(_) => break()
+      case _               =>
+    }
+
+    set(-v)
+    currentState = ReverseState(v)
+    //println(s"ESC current state : $currentState")
+  }
+
+  def break():Unit =
+  {
+    stop()
+    Thread.sleep(1000)
+    set(-10)
+    Thread.sleep(1000)
+    stop()
+    Thread.sleep(1000)
+  }
 }
 
 
 abstract class MotorCommand
-case class Forward() extends MotorCommand
-case class Backward() extends MotorCommand
-case class Break() extends MotorCommand
-case class Release() extends MotorCommand
+case class MotorForward() extends MotorCommand
+case class MotorBackward() extends MotorCommand
+case class MotorBreak() extends MotorCommand
+case class MotorRelease() extends MotorCommand
 
 abstract class SteppingCommand
 case class SingleStep() extends SteppingCommand
@@ -184,10 +286,10 @@ class DCMotor extends MotorPWMDevice
     println("DCMotor.init has been called, " + pwmPin + " " + in2Pin + " " + in1Pin)
   }
 
-  def forward=run(Forward())
-  def backward=run(Backward())
-  def release=run(Release())
-  def stop=run(Release())
+  def forward=run(MotorForward())
+  def backward=run(MotorBackward())
+  def release=run(MotorRelease())
+  def stop=run(MotorRelease())
 
   def run(command:MotorCommand):Unit=
   {
@@ -196,11 +298,11 @@ class DCMotor extends MotorPWMDevice
       case Some(pwm) =>
         command match
         {
-          case Forward()  => pwm.setPin(in2Pin, 0)
+          case MotorForward()  => pwm.setPin(in2Pin, 0)
                              pwm.setPin(in1Pin, 1)
-          case Backward() => pwm.setPin(in1Pin, 0)
+          case MotorBackward() => pwm.setPin(in1Pin, 0)
                              pwm.setPin(in2Pin, 1)
-          case Release()  => pwm.setPin(in1Pin, 0)
+          case MotorRelease()  => pwm.setPin(in1Pin, 0)
                              pwm.setPin(in2Pin, 0)
         }
       case None      => println(this + " this DCMotor has not been attached to any PWMController")
@@ -270,7 +372,7 @@ class StepperMotor(steps:Int=200,
 
     def singleStep(dir:MotorCommand):Unit=
     {
-      val iDir = if(dir == Forward()) 1 else -1
+      val iDir = if(dir == MotorForward()) 1 else -1
       if((currentStep / (microSteps / 2)) % 2 != 0)
         currentStep = currentStep + (microSteps / 2) * iDir
       else
@@ -279,7 +381,7 @@ class StepperMotor(steps:Int=200,
 
     def doubleStep(dir:MotorCommand):Unit=
     {
-      val iDir = if(dir == Forward()) 1 else -1
+      val iDir = if(dir == MotorForward()) 1 else -1
       if((currentStep / (microSteps / 2)) % 2 == 0)
         currentStep = currentStep + (microSteps / 2) * iDir
       else
@@ -288,13 +390,13 @@ class StepperMotor(steps:Int=200,
 
     def interleaveStep(dir:MotorCommand):Unit=
     {
-      val iDir = if(dir == Forward()) 1 else -1
+      val iDir = if(dir == MotorForward()) 1 else -1
       currentStep = currentStep + (microSteps / 2) * iDir
     }
 
     def microStep(dir:MotorCommand):Unit=
     {
-      val iDir = if(dir == Forward()) 1 else -1
+      val iDir = if(dir == MotorForward()) 1 else -1
       currentStep = currentStep + iDir
       currentStep = currentStep + microSteps * 4
       currentStep = currentStep % microSteps * 4

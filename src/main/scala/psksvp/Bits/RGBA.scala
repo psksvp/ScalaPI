@@ -35,13 +35,30 @@
  * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  */
 
-package psksvp.Concurrency
+package psksvp.Bits
 
-/**
-  * Created by psksvp on 25/11/2015.
-  */
-abstract class DataProcessor
+class RGBA(pixel:Int)
 {
-  def run:Unit
-  def stop:Unit
+  lazy val alpha:Int = (pixel >> 24) & 0xff
+  lazy val red:Int   = (pixel >> 16) & 0xff
+  lazy val green:Int = (pixel >>  8) & 0xff
+  lazy val blue:Int  = (pixel      ) & 0xff
+  lazy val asIntArray:Array[Int] = Array[Int](red, green, blue, alpha)
+  lazy val asFloat64Array:Array[Double] = Array[Double](red, green, blue, alpha)
+  lazy val asFloat64RGB:Array[Double] = Array[Double](red, green, blue)
+
+  lazy val rgb:(Int, Int, Int) = (red, green, blue)
+  lazy val rgba:(Int, Int, Int, Int) = (red, green, blue, alpha)
+}
+
+object RGBA
+{
+  def apply(pixel:Int):RGBA = new RGBA(pixel)
+  def apply(red:Int, green:Int, blue:Int, alpha:Int = 255):Int = (alpha << 24) | (red << 16) | (green << 8) | blue
+
+  lazy val black:Int = apply(0, 0, 0)
+  lazy val white:Int = apply(255, 255, 255)
+  def red(intensity:Int):Int = apply(intensity, 0, 0)
+  def green(intensity:Int):Int = apply(0, intensity, 0)
+  def blue(intensity:Int):Int = apply(0, 0, intensity)
 }

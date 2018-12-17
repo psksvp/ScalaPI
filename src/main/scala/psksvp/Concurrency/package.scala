@@ -35,13 +35,17 @@
  * By using the provided information, libraries or software, you solely take the risks of damaging your hardwares.
  */
 
-package psksvp.Concurrency
+package psksvp
 
-/**
-  * Created by psksvp on 25/11/2015.
-  */
-abstract class DataProcessor
+package object Concurrency
 {
-  def run:Unit
-  def stop:Unit
+
+  // credit : http://www.rationaljava.com/2015/10/measuring-microsecond-in-java.html
+  def microSecondWait(micros:Long):Unit =
+  {
+    val waitUntil = System.nanoTime() + (micros * 1000)
+    while(waitUntil > System.nanoTime())
+    {
+    }
+  }
 }
